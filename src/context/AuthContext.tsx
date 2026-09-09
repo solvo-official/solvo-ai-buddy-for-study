@@ -20,24 +20,25 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem('solvo_token') || 'demo_user');
+  const [token, setToken] = useState<string | null>(() => localStorage.getItem('solvo_token'));
   const [isLoading, setIsLoading] = useState(true);
 
   const refreshProfile = async () => {
+    const storedToken = localStorage.getItem('solvo_token');
+    if (!storedToken || storedToken === 'null' || storedToken === 'undefined') {
+      setUser(null);
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const u = await api.getProfile();
       setUser(u);
     } catch (err) {
-      console.warn('Could not fetch profile, falling back to guest:', err);
-      // Auto-initialize guest on first launch
-      try {
-        const res = await api.loginAsGuest();
-        setUser(res.user);
-        setToken(res.token);
-        localStorage.setItem('solvo_token', res.token);
-      } catch (guestErr) {
-        console.error('Guest init failed:', guestErr);
-      }
+      console.warn('Could not fetch profile, clearing session:', err);
+      localStorage.removeItem('solvo_token');
+      setToken(null);
+      setUser(null);
     } finally {
       setIsLoading(false);
     }
@@ -109,7 +110,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = () => {
     localStorage.removeItem('solvo_token');
-    loginAsGuest();
+    setToken(null);
+    setUser(null);
   };
 
   const updateProfile = async (updates: Partial<UserProfile>) => {

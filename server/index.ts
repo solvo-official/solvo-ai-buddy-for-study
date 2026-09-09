@@ -77,7 +77,7 @@ if (fs.existsSync(DIST_DIR)) {
   app.use(express.static(DIST_DIR));
 }
 
-// Helper: Get user from request header (or fallback to demo_user)
+// Helper: Get user from request header
 function getAuthUserId(req: Request): string {
   const authHeader = req.headers['authorization'];
   if (authHeader && authHeader.startsWith('Bearer ')) {
@@ -86,7 +86,7 @@ function getAuthUserId(req: Request): string {
       return token;
     }
   }
-  return 'demo_user';
+  return '';
 }
 
 // ==========================================
@@ -96,19 +96,29 @@ function getAuthUserId(req: Request): string {
 app.post('/api/auth/register', (req: Request, res: Response) => {
   try {
     const { name, email, educationLevel, preferredLanguage, mainStudyGoal } = req.body;
-    if (!name || !email) {
-      return res.status(400).json({ error: 'Name and email are required.' });
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required.' });
     }
 
-    const existing = db.getUserByEmail(email);
+    const cleanEmail = email.trim().toLowerCase();
+    let existing = db.getUserByEmail(cleanEmail);
     if (existing) {
+      if (name || educationLevel) {
+        existing = db.updateUser(existing.id, {
+          name: name?.trim() || existing.name,
+          educationLevel: educationLevel || existing.educationLevel,
+          preferredLanguage: preferredLanguage || existing.preferredLanguage,
+          mainStudyGoal: mainStudyGoal || existing.mainStudyGoal,
+        }) || existing;
+      }
       return res.json({ user: existing, token: existing.id });
     }
 
+    const normalizedId = 'user_' + cleanEmail.replace(/[^a-zA-Z0-9]/g, '_');
     const newUser: UserRecord = {
-      id: `user_${Date.now()}`,
-      name: name.trim(),
-      email: email.trim().toLowerCase(),
+      id: normalizedId,
+      name: name?.trim() || cleanEmail.split('@')[0],
+      email: cleanEmail,
       isGuest: false,
       educationLevel: educationLevel || 'College / A-Levels',
       preferredLanguage: preferredLanguage || 'en',
@@ -136,17 +146,19 @@ app.post('/api/auth/login', (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Email is required.' });
     }
 
-    let user = db.getUserByEmail(email);
+    const cleanEmail = email.trim().toLowerCase();
+    let user = db.getUserByEmail(cleanEmail);
     if (!user) {
-      // Auto-create for demo/prototype convenience
+      // Auto-create workspace partitioned by this student's email
+      const normalizedId = 'user_' + cleanEmail.replace(/[^a-zA-Z0-9]/g, '_');
       user = {
-        id: `user_${Date.now()}`,
-        name: email.split('@')[0],
-        email: email.trim().toLowerCase(),
+        id: normalizedId,
+        name: cleanEmail.split('@')[0],
+        email: cleanEmail,
         isGuest: false,
         educationLevel: 'College / A-Levels',
         preferredLanguage: 'en',
-        mainStudyGoal: 'Master curriculum concepts',
+        mainStudyGoal: 'Master curriculum concepts with Solvo AI',
         plan: 'free',
         streakDays: 1,
         lastActiveDate: new Date().toISOString().split('T')[0],
@@ -203,8 +215,8 @@ app.post('/api/auth/google', (req: Request, res: Response) => {
 
       user = db.updateUser(user.id, updates) || user;
     } else {
-      // Register new user via Google
-      const newId = `google_${googleId || Date.now()}`;
+      // Register new user via Google with persistent email-based ID
+      const newId = 'user_' + cleanEmail.replace(/[^a-zA-Z0-9]/g, '_');
       user = {
         id: newId,
         name: name?.trim() || cleanEmail.split('@')[0],
@@ -261,7 +273,10 @@ app.post('/api/auth/guest', (_req: Request, res: Response) => {
 
 app.get('/api/auth/profile', (req: Request, res: Response) => {
   const userId = getAuthUserId(req);
-  const user = db.getUserById(userId) || db.getUserById('demo_user');
+  if (!userId) {
+    return res.status(401).json({ error: 'Unauthorized. Please sign in with your Gmail.' });
+  }
+  const user = db.getUserById(userId);
   if (!user) {
     return res.status(404).json({ error: 'User not found' });
   }

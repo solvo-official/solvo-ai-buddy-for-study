@@ -14,10 +14,11 @@ import type {
 const API_BASE = '/api';
 
 function getHeaders(isFormData = false): HeadersInit {
-  const token = localStorage.getItem('solvo_token') || 'demo_user';
-  const headers: Record<string, string> = {
-    Authorization: `Bearer ${token}`,
-  };
+  const token = localStorage.getItem('solvo_token');
+  const headers: Record<string, string> = {};
+  if (token && token !== 'null' && token !== 'undefined') {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
   if (!isFormData) {
     headers['Content-Type'] = 'application/json';
   }

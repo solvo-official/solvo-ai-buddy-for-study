@@ -17,6 +17,7 @@ import { ProgressView } from './components/ProgressView.tsx';
 import { ProfileView } from './components/ProfileView.tsx';
 import { UpgradeModal } from './components/UpgradeModal.tsx';
 import { AuthModal } from './components/AuthModal.tsx';
+import { AuthGateView } from './components/AuthGateView.tsx';
 import type { SolvedQuestion } from './types/index.ts';
 
 const MainApp: React.FC = () => {
@@ -87,6 +88,11 @@ const MainApp: React.FC = () => {
         <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Loading your study buddy...</p>
       </div>
     );
+  }
+
+  // Mandatory Authentication Gate: require user to sign in with their Gmail
+  if (!user) {
+    return <AuthGateView />;
   }
 
   return (
