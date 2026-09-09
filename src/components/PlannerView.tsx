@@ -1,14 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   CalendarCheck,
   Sparkles,
   CheckCircle2,
   Circle,
   Clock,
-  Calendar,
-  AlertCircle,
   Plus,
-  BookOpen,
 } from 'lucide-react';
 import { api } from '../api/client.ts';
 import type { StudyPlan } from '../types/index.ts';
@@ -28,21 +25,19 @@ export const PlannerView: React.FC = () => {
   const [dailyHours, setDailyHours] = useState(2.5);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  useEffect(() => {
-    loadPlans();
-  }, []);
-
-  const loadPlans = async () => {
+  const loadPlans = useCallback(async () => {
     try {
       const list = await api.getStudyPlans();
       setPlans(list);
-      if (list.length > 0 && !activePlan) {
-        setActivePlan(list[0]);
-      }
+      setActivePlan((curr) => curr || (list.length > 0 ? list[0] : null));
     } catch (err) {
       console.warn('Failed to load study plans:', err);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadPlans();
+  }, [loadPlans]);
 
   const handleToggleTask = async (taskId: string, currentCompleted: boolean) => {
     if (!activePlan) return;

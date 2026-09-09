@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   FileText,
   Upload,
@@ -7,8 +7,6 @@ import {
   Trash2,
   Layers,
   CheckCircle2,
-  ChevronDown,
-  ChevronUp,
 } from 'lucide-react';
 import { api } from '../api/client.ts';
 import type { StudyNote } from '../types/index.ts';
@@ -27,21 +25,19 @@ export const NotesView: React.FC<NotesViewProps> = ({ onGenerateFlashcards }) =>
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadNotes();
-  }, []);
-
-  const loadNotes = async () => {
+  const loadNotes = useCallback(async () => {
     try {
       const list = await api.getNotes();
       setNotes(list);
-      if (list.length > 0 && !activeNote) {
-        setActiveNote(list[0]);
-      }
+      setActiveNote((curr) => curr || (list.length > 0 ? list[0] : null));
     } catch (err) {
       console.warn('Could not load notes:', err);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadNotes();
+  }, [loadNotes]);
 
   const handleSummarize = async (e: React.FormEvent) => {
     e.preventDefault();

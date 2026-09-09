@@ -2,7 +2,6 @@ import type {
   SolutionStep,
   AlternativeMethod,
   QuizQuestion,
-  Flashcard,
   StudyPlanTask,
 } from '../../src/types/index.ts';
 

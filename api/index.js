@@ -471,7 +471,7 @@ var Database = class {
   }
   getTutorMessages(userId, conversationId = "default") {
     return this.data.tutorMessages.filter(
-      (m) => (m.userId === userId || m.userId === "demo_user") && m.conversationId === conversationId
+      (m) => m.userId === userId && m.conversationId === conversationId
     );
   }
   clearTutorMessages(userId, conversationId = "default") {
@@ -556,6 +556,122 @@ var Database = class {
     }
     return plan;
   }
+  // Real-time Progress Analytics for Student
+  getProgressSummary(userId) {
+    const user = this.getUserById(userId);
+    const questions = this.getQuestionsByUserId(userId);
+    const quizResults = this.getQuizResults(userId);
+    const notes = this.getNotesByUserId(userId);
+    const flashcards = this.getFlashcardsByUserId(userId);
+    const questionsSolved = questions.length;
+    const quizzesCompleted = quizResults.length;
+    const averageQuizScore = quizzesCompleted > 0 ? Math.round(quizResults.reduce((acc, q) => acc + q.percentage, 0) / quizzesCompleted) : 0;
+    const studyStreak = user?.streakDays || 1;
+    const studyTimeMinutes = questionsSolved * 6 + quizzesCompleted * 12 + notes.length * 8 + flashcards.length * 3;
+    const subjectMap = /* @__PURE__ */ new Map();
+    for (const q of questions) {
+      const s = q.subject || "General STEM";
+      const curr = subjectMap.get(s) || { count: 0, totalScore: 0, scoreCount: 0 };
+      curr.count += 1;
+      subjectMap.set(s, curr);
+    }
+    for (const qr of quizResults) {
+      const s = qr.subject || "General STEM";
+      const curr = subjectMap.get(s) || { count: 0, totalScore: 0, scoreCount: 0 };
+      curr.count += 1;
+      curr.totalScore += qr.percentage;
+      curr.scoreCount += 1;
+      subjectMap.set(s, curr);
+    }
+    const subjectsStudied = Array.from(subjectMap.entries()).map(([subject, data]) => ({
+      subject,
+      count: data.count,
+      accuracy: data.scoreCount > 0 ? Math.round(data.totalScore / data.scoreCount) : 85
+    }));
+    const strongSet = /* @__PURE__ */ new Set();
+    const weakSet = /* @__PURE__ */ new Set();
+    for (const qr of quizResults) {
+      if (qr.percentage >= 80) {
+        strongSet.add(qr.topic);
+      } else {
+        weakSet.add(qr.topic);
+      }
+    }
+    const strongTopics = Array.from(strongSet);
+    const weakTopics = Array.from(weakSet);
+    const recentActivity = [];
+    for (const q of questions.slice(0, 3)) {
+      recentActivity.push({
+        id: q.id,
+        type: "question",
+        title: q.questionText.slice(0, 45) + (q.questionText.length > 45 ? "..." : ""),
+        subtitle: `${q.subject} \xB7 ${q.topic}`,
+        timestamp: q.createdAt
+      });
+    }
+    for (const qr of quizResults.slice(0, 2)) {
+      recentActivity.push({
+        id: qr.id,
+        type: "quiz",
+        title: `${qr.topic} Quiz (${qr.percentage}%)`,
+        subtitle: `${qr.subject} \xB7 ${qr.score}/${qr.totalQuestions} correct`,
+        timestamp: qr.completedAt
+      });
+    }
+    for (const n of notes.slice(0, 2)) {
+      recentActivity.push({
+        id: n.id,
+        type: "note",
+        title: n.title,
+        subtitle: `${n.subject} \xB7 Revision summary`,
+        timestamp: n.createdAt
+      });
+    }
+    const recommendations = [];
+    if (weakTopics.length > 0) {
+      const topWeak = weakTopics[0];
+      const matchingQuiz = quizResults.find((qr) => qr.topic === topWeak);
+      recommendations.push({
+        id: `rec_weak_${topWeak}`,
+        title: `${topWeak}: Concept Booster`,
+        description: `Your last quiz score indicated room for growth in ${topWeak}. Reviewing key definitions and retaking a focused quiz will solidify your mastery.`,
+        actionType: "quiz",
+        subject: matchingQuiz?.subject || "STEM",
+        topic: topWeak
+      });
+    } else if (questionsSolved > 0) {
+      const lastQ = questions[0];
+      recommendations.push({
+        id: `rec_practice_${lastQ.topic}`,
+        title: `Test Knowledge: ${lastQ.topic}`,
+        description: `You recently solved problems in ${lastQ.topic}. Reinforce what you learned with a quick 5-question evaluation.`,
+        actionType: "quiz",
+        subject: lastQ.subject,
+        topic: lastQ.topic
+      });
+    } else {
+      recommendations.push({
+        id: "rec_welcome",
+        title: "Start with your First Problem",
+        description: "Scan an equation from your notes or type a homework question to see Solvo AI breakdown the solution step-by-step.",
+        actionType: "practice",
+        subject: "General Science",
+        topic: "Problem Solving"
+      });
+    }
+    return {
+      questionsSolved,
+      quizzesCompleted,
+      averageQuizScore,
+      studyStreak,
+      studyTimeMinutes,
+      subjectsStudied,
+      strongTopics,
+      weakTopics,
+      recentActivity,
+      recommendations
+    };
+  }
 };
 var db = new Database();
 
@@ -629,7 +745,7 @@ var MathEngine = class {
         }
       };
     }
-    const binaryMatch = standardized.match(/^([+-]?\d+(?:\.\d+)?)\s*([\+\-\*\/xX\^])\s*([+-]?\d+(?:\.\d+)?)$/);
+    const binaryMatch = standardized.match(/^([+-]?\d+(?:\.\d+)?)\s*([+\-*xX^/])\s*([+-]?\d+(?:\.\d+)?)$/);
     if (binaryMatch) {
       const a = parseFloat(binaryMatch[1]);
       const op = binaryMatch[2];
@@ -747,9 +863,9 @@ Operation: ${opName} (${opSymbol})`,
         }
       };
     }
-    if (/^[0-9\.\s\+\-\*\/\(\)\^]+$/.test(standardized) && /[0-9]/.test(standardized) && /[\+\-\*\/]/.test(standardized)) {
+    if (/^[0-9.\s+\-*()^/]+$/.test(standardized) && /[0-9]/.test(standardized) && /[+\-*/]/.test(standardized)) {
       try {
-        const sanitized = standardized.replace(/[^0-9\.\+\-\*\/\(\)]/g, "");
+        const sanitized = standardized.replace(/[^0-9.+\-*()/]/g, "");
         const evalVal = Function(`"use strict"; return (${sanitized})`)();
         if (typeof evalVal === "number" && !isNaN(evalVal) && isFinite(evalVal)) {
           const formatted = Number.isInteger(evalVal) ? evalVal.toString() : evalVal.toFixed(4).replace(/\.?0+$/, "");
@@ -1934,7 +2050,7 @@ app.post("/api/auth/login", (req, res) => {
 });
 app.post("/api/auth/google", (req, res) => {
   try {
-    let { email, name, googleId, picture, credential, educationLevel } = req.body;
+    let { email, name, _googleId, picture, credential, educationLevel } = req.body;
     if (credential && typeof credential === "string") {
       try {
         const parts = credential.split(".");
@@ -1943,7 +2059,7 @@ app.post("/api/auth/google", (req, res) => {
           const payload = JSON.parse(payloadJson);
           if (payload.email) email = payload.email;
           if (payload.name) name = payload.name;
-          if (payload.sub) googleId = payload.sub;
+          if (payload.sub) _googleId = payload.sub;
           if (payload.picture) picture = payload.picture;
         }
       } catch (tokenErr) {
@@ -2038,7 +2154,7 @@ app.patch("/api/auth/profile", (req, res) => {
 app.post("/api/ai/solve", upload.single("image"), async (req, res) => {
   try {
     const userId = getAuthUserId(req);
-    const user = db.getUserById(userId) || db.getUserById("demo_user");
+    const user = db.getUserById(userId);
     if (user && user.plan === "free") {
       if (req.file && user.scansUsedToday >= 10) {
         return res.status(429).json({
@@ -2439,99 +2555,12 @@ app.patch("/api/planner/:planId/tasks/:taskId", (req, res) => {
 });
 app.get("/api/progress/summary", (req, res) => {
   const userId = getAuthUserId(req);
-  const user = db.getUserById(userId) || db.getUserById("demo_user");
-  const questions = db.getQuestionsByUserId(userId);
-  const quizResults = db.getQuizResults(userId);
-  const flashcards = db.getFlashcardsByUserId(userId);
-  const totalQuestions = questions.length || user?.questionsSolvedCount || 0;
-  const totalQuizzes = quizResults.length;
-  const avgScore = totalQuizzes > 0 ? Math.round(quizResults.reduce((acc, curr) => acc + curr.percentage, 0) / totalQuizzes) : 78;
-  const subjectMap = /* @__PURE__ */ new Map();
-  questions.forEach((q) => {
-    const s = q.subject || "General";
-    const entry = subjectMap.get(s) || { count: 0, totalScore: 0, quizCount: 0 };
-    entry.count++;
-    subjectMap.set(s, entry);
-  });
-  quizResults.forEach((r) => {
-    const s = r.subject || "General";
-    const entry = subjectMap.get(s) || { count: 0, totalScore: 0, quizCount: 0 };
-    entry.totalScore += r.percentage;
-    entry.quizCount++;
-    subjectMap.set(s, entry);
-  });
-  if (subjectMap.size === 0) {
-    subjectMap.set("Mathematics", { count: 12, totalScore: 85, quizCount: 1 });
-    subjectMap.set("Physics", { count: 8, totalScore: 75, quizCount: 1 });
-    subjectMap.set("Chemistry", { count: 4, totalScore: 90, quizCount: 1 });
-  }
-  const subjectsStudied = Array.from(subjectMap.entries()).map(([subject, data]) => ({
-    subject,
-    count: data.count,
-    accuracy: data.quizCount > 0 ? Math.round(data.totalScore / data.quizCount) : 80
-  }));
-  const weakTopics = Array.from(
-    new Set(
-      quizResults.filter((r) => r.percentage < 75).flatMap((r) => r.weakTopics).concat(["Quadratic Equations - Factoring Traps", "Thermodynamics Sign Conventions"])
-    )
-  ).slice(0, 3);
-  const strongTopics = Array.from(
-    new Set(
-      quizResults.filter((r) => r.percentage >= 75).map((r) => `${r.subject}: ${r.topic}`).concat(["Physics: Newton's 2nd Law", "Calculus: Derivatives of Polynomials"])
-    )
-  ).slice(0, 3);
-  const recommendations = [
-    {
-      id: "rec_1",
-      title: "Targeted Review: Quadratic Equations",
-      description: "You scored 80% on quadratic equations. Review the vertex formula -b/(2a), then attempt a quick 5-question quiz.",
-      actionType: "quiz",
-      subject: "Mathematics",
-      topic: "Quadratic Equations"
-    },
-    {
-      id: "rec_2",
-      title: "Active Recall: Flashcard Deck",
-      description: "You have 3 flashcards scheduled for review today. Review them to keep your active recall sharp.",
-      actionType: "review",
-      subject: "Physics",
-      topic: "Electromagnetism"
-    }
-  ];
-  const recentActivity = [
-    ...questions.slice(0, 3).map((q) => ({
-      id: q.id,
-      type: "question",
-      title: `Solved: ${q.subject}`,
-      subtitle: q.questionText.slice(0, 45) + "...",
-      timestamp: q.createdAt
-    })),
-    ...quizResults.slice(0, 2).map((r) => ({
-      id: r.id,
-      type: "quiz",
-      title: `Quiz: ${r.topic} (${r.percentage}%)`,
-      subtitle: `${r.score}/${r.totalQuestions} questions correct`,
-      timestamp: r.completedAt
-    }))
-  ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-  return res.json({
-    summary: {
-      questionsSolved: totalQuestions,
-      quizzesCompleted: totalQuizzes,
-      averageQuizScore: avgScore,
-      studyStreak: user?.streakDays || 5,
-      studyTimeMinutes: (user?.questionsSolvedCount || 10) * 8 + 45,
-      subjectsStudied,
-      strongTopics,
-      weakTopics,
-      recentActivity: recentActivity.slice(0, 5),
-      recommendations
-    }
-  });
+  const summary = db.getProgressSummary(userId);
+  return res.json({ success: true, summary });
 });
 app.get("/api/entitlements", (req, res) => {
   const userId = getAuthUserId(req);
-  const user = db.getUserById(userId) || db.getUserById("demo_user");
+  const user = db.getUserById(userId);
   const isPremium = user?.plan === "premium";
   return res.json({
     plan: user?.plan || "free",

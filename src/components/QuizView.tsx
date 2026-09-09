@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   CheckCircle2,
   XCircle,
@@ -8,9 +8,6 @@ import {
   RotateCcw,
   Trophy,
   AlertTriangle,
-  ChevronRight,
-  Clock,
-  Layers,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { api } from '../api/client.ts';
@@ -38,18 +35,18 @@ export const QuizView: React.FC = () => {
   const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
   const [pastResults, setPastResults] = useState<QuizResult[]>([]);
 
-  useEffect(() => {
-    loadPastResults();
-  }, []);
-
-  const loadPastResults = async () => {
+  const loadPastResults = useCallback(async () => {
     try {
       const results = await api.getQuizResults();
       setPastResults(results);
     } catch (err) {
       console.warn('Failed to load past quiz results:', err);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadPastResults();
+  }, [loadPastResults]);
 
   const handleStartQuiz = async () => {
     if (!subject || !topic.trim()) {

@@ -2,9 +2,6 @@ import React, { useState } from 'react';
 import {
   User,
   Crown,
-  BookOpen,
-  Globe,
-  Target,
   LogOut,
   Save,
   CheckCircle2,

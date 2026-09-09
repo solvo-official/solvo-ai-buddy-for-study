@@ -8,7 +8,6 @@ import {
   Bookmark,
   AlertTriangle,
   ArrowRight,
-  Sparkles,
   Award,
   ChevronRight,
 } from 'lucide-react';
@@ -80,8 +79,10 @@ export const ProgressView: React.FC<ProgressViewProps> = ({ onSelectQuestion, on
             <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Questions Solved</span>
             <Target size={16} color="var(--color-primary)" />
           </div>
-          <div style={{ fontSize: '1.6rem', fontWeight: 800 }}>{progress?.questionsSolved || 24}</div>
-          <span style={{ fontSize: '0.72rem', color: 'var(--color-success)' }}>+3 today</span>
+          <div style={{ fontSize: '1.6rem', fontWeight: 800 }}>{progress?.questionsSolved ?? 0}</div>
+          <span style={{ fontSize: '0.72rem', color: 'var(--color-success)' }}>
+            {progress && progress.questionsSolved > 0 ? `${progress.questionsSolved} completed` : 'Start today'}
+          </span>
         </div>
 
         <div className="card" style={{ padding: 'var(--space-4)' }}>
@@ -89,7 +90,7 @@ export const ProgressView: React.FC<ProgressViewProps> = ({ onSelectQuestion, on
             <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Quizzes Taken</span>
             <CheckCircle2 size={16} color="var(--color-success)" />
           </div>
-          <div style={{ fontSize: '1.6rem', fontWeight: 800 }}>{progress?.quizzesCompleted || 1}</div>
+          <div style={{ fontSize: '1.6rem', fontWeight: 800 }}>{progress?.quizzesCompleted ?? 0}</div>
           <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Evaluated</span>
         </div>
 
@@ -99,9 +100,11 @@ export const ProgressView: React.FC<ProgressViewProps> = ({ onSelectQuestion, on
             <Award size={16} color="var(--color-warning)" />
           </div>
           <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--color-success)' }}>
-            {progress?.averageQuizScore || 80}%
+            {progress && progress.quizzesCompleted > 0 ? `${progress.averageQuizScore}%` : '--'}
           </div>
-          <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>High mastery</span>
+          <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+            {progress && progress.quizzesCompleted > 0 ? (progress.averageQuizScore >= 80 ? 'High mastery' : 'Developing') : 'No quizzes yet'}
+          </span>
         </div>
 
         <div className="card" style={{ padding: 'var(--space-4)' }}>
@@ -110,9 +113,9 @@ export const ProgressView: React.FC<ProgressViewProps> = ({ onSelectQuestion, on
             <Flame size={16} fill="var(--color-warning)" color="var(--color-warning)" />
           </div>
           <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--color-warning)' }}>
-            {progress?.studyStreak || 5}d
+            {progress?.studyStreak ?? 1}d
           </div>
-          <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Unbroken</span>
+          <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Active</span>
         </div>
 
         <div className="card" style={{ padding: 'var(--space-4)' }}>
@@ -121,7 +124,7 @@ export const ProgressView: React.FC<ProgressViewProps> = ({ onSelectQuestion, on
             <Clock size={16} color="var(--color-accent)" />
           </div>
           <div style={{ fontSize: '1.6rem', fontWeight: 800 }}>
-            {Math.round((progress?.studyTimeMinutes || 120) / 60)}h {(progress?.studyTimeMinutes || 120) % 60}m
+            {progress ? `${Math.floor((progress.studyTimeMinutes || 0) / 60)}h ${(progress.studyTimeMinutes || 0) % 60}m` : '0h 0m'}
           </div>
           <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Total active</span>
         </div>
@@ -175,24 +178,30 @@ export const ProgressView: React.FC<ProgressViewProps> = ({ onSelectQuestion, on
           </h3>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-            {progress?.subjectsStudied?.map((s) => (
-              <div key={s.subject}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', fontWeight: 600, marginBottom: '4px' }}>
-                  <span>{s.subject}</span>
-                  <span style={{ color: 'var(--color-primary)' }}>{s.accuracy}% accuracy</span>
+            {!progress?.subjectsStudied || progress.subjectsStudied.length === 0 ? (
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', padding: 'var(--space-2) 0' }}>
+                Solve problems or generate notes to populate subject mastery breakdown.
+              </p>
+            ) : (
+              progress.subjectsStudied.map((s) => (
+                <div key={s.subject}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', fontWeight: 600, marginBottom: '4px' }}>
+                    <span>{s.subject}</span>
+                    <span style={{ color: 'var(--color-primary)' }}>{s.accuracy}% accuracy</span>
+                  </div>
+                  <div style={{ height: '6px', width: '100%', background: 'var(--bg-surface-subtle)', borderRadius: 'var(--radius-full)', overflow: 'hidden' }}>
+                    <div
+                      style={{
+                        height: '100%',
+                        width: `${s.accuracy}%`,
+                        background: 'var(--color-primary)',
+                        borderRadius: 'var(--radius-full)',
+                      }}
+                    />
+                  </div>
                 </div>
-                <div style={{ height: '6px', width: '100%', background: 'var(--bg-surface-subtle)', borderRadius: 'var(--radius-full)', overflow: 'hidden' }}>
-                  <div
-                    style={{
-                      height: '100%',
-                      width: `${s.accuracy}%`,
-                      background: 'var(--color-primary)',
-                      borderRadius: 'var(--radius-full)',
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
 
@@ -205,30 +214,38 @@ export const ProgressView: React.FC<ProgressViewProps> = ({ onSelectQuestion, on
           {/* Strong */}
           <div style={{ marginBottom: 'var(--space-4)' }}>
             <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--color-success)', textTransform: 'uppercase' }}>
-              Strong Topics (Ready for Exam)
+              Strong Topics (Mastered)
             </span>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '6px' }}>
-              {progress?.strongTopics?.map((t, idx) => (
-                <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
-                  <CheckCircle2 size={14} color="var(--color-success)" />
-                  <span>{t}</span>
-                </div>
-              ))}
+              {!progress?.strongTopics || progress.strongTopics.length === 0 ? (
+                <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>Complete quizzes with 80%+ to unlock mastered topics.</span>
+              ) : (
+                progress.strongTopics.map((t, idx) => (
+                  <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
+                    <CheckCircle2 size={14} color="var(--color-success)" />
+                    <span>{t}</span>
+                  </div>
+                ))
+              )}
             </div>
           </div>
 
           {/* Weak */}
           <div>
             <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--color-danger)', textTransform: 'uppercase' }}>
-              Focus Areas (Need Revision)
+              Focus Areas (Need Practice)
             </span>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '6px' }}>
-              {progress?.weakTopics?.map((t, idx) => (
-                <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
-                  <AlertTriangle size={14} color="var(--color-danger)" />
-                  <span>{t}</span>
-                </div>
-              ))}
+              {!progress?.weakTopics || progress.weakTopics.length === 0 ? (
+                <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>No struggling topics detected. Great job!</span>
+              ) : (
+                progress.weakTopics.map((t, idx) => (
+                  <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
+                    <AlertTriangle size={14} color="var(--color-danger)" />
+                    <span>{t}</span>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>

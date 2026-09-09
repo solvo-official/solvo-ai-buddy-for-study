@@ -8,7 +8,6 @@ import {
   ArrowRight,
   Sparkles,
   BookOpen,
-  Clock,
   ChevronRight,
   TrendingUp,
   Layers,
@@ -56,7 +55,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate, onOpenScan, onSe
     loadDashboardData();
   }, []);
 
-  const questionsSolvedToday = user?.questionsSolvedToday || 2;
+  const questionsSolvedToday = user?.questionsSolvedToday ?? 0;
   const dailyGoal = 5;
   const goalPercent = Math.min(100, Math.round((questionsSolvedToday / dailyGoal) * 100));
 
@@ -188,7 +187,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate, onOpenScan, onSe
           </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: '8px' }}>
             <span style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--color-warning)' }}>
-              {user?.streakDays || 5} Days
+              {user?.streakDays ?? 1} Days
             </span>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Consistent</span>
           </div>
@@ -205,47 +204,92 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate, onOpenScan, onSe
           </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: '8px' }}>
             <span style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--color-success)' }}>
-              {progress?.averageQuizScore || 80}%
+              {progress && progress.quizzesCompleted > 0 ? `${progress.averageQuizScore}%` : '--'}
             </span>
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Accuracy</span>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+              {progress && progress.quizzesCompleted > 0 ? 'Accuracy' : 'No quizzes yet'}
+            </span>
           </div>
           <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-            Based on {progress?.quizzesCompleted || 1} completed quizzes
+            {progress && progress.quizzesCompleted > 0
+              ? `Based on ${progress.quizzesCompleted} completed quiz${progress.quizzesCompleted === 1 ? '' : 'zes'}`
+              : 'Take your first quiz to calculate accuracy'}
           </p>
         </div>
       </div>
 
-      {/* Recommended Topic Card */}
-      <div
-        className="card card-interactive"
-        style={{
-          borderLeft: '4px solid var(--color-primary)',
-          padding: 'var(--space-5)',
-          marginBottom: 'var(--space-6)',
-        }}
-      >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 'var(--space-3)' }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-              <span className="badge badge-primary">Recommended for you</span>
-              <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Mathematics</span>
-            </div>
-            <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '4px' }}>
-              Quadratic Equations: Factoring & Roots
-            </h3>
-            <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', maxWidth: '560px' }}>
-              You scored 80% on quadratic equations recently. Reviewing the vertex formula and factorization traps will secure complete mastery.
-            </p>
-          </div>
+      {/* Dynamic Recommended Topic / Onboarding Card */}
+      {(() => {
+        const topRec = progress?.recommendations?.[0];
+        if (topRec && progress && progress.quizzesCompleted > 0) {
+          return (
+            <div
+              className="card card-interactive"
+              style={{
+                borderLeft: '4px solid var(--color-primary)',
+                padding: 'var(--space-5)',
+                marginBottom: 'var(--space-6)',
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 'var(--space-3)' }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                    <span className="badge badge-primary">Recommended for you</span>
+                    <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{topRec.subject}</span>
+                  </div>
+                  <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '4px' }}>
+                    {topRec.title}
+                  </h3>
+                  <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', maxWidth: '560px' }}>
+                    {topRec.description}
+                  </p>
+                </div>
 
-          <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
-            <button className="btn btn-primary btn-sm" onClick={() => onNavigate('quizzes')}>
-              <span>Start 5-Q Quiz</span>
-              <ArrowRight size={14} />
-            </button>
+                <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+                  <button className="btn btn-primary btn-sm" onClick={() => onNavigate('quizzes')}>
+                    <span>Practice Quiz</span>
+                    <ArrowRight size={14} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        return (
+          <div
+            className="card card-interactive"
+            style={{
+              borderLeft: '4px solid var(--color-accent)',
+              padding: 'var(--space-5)',
+              marginBottom: 'var(--space-6)',
+              background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.08), rgba(99, 102, 241, 0.04))',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 'var(--space-3)' }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                  <span className="badge badge-accent">Getting Started</span>
+                  <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Personalized Learning</span>
+                </div>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '4px' }}>
+                  Welcome to your Solvo Study Workspace
+                </h3>
+                <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', maxWidth: '560px' }}>
+                  Scan a difficult homework question, chat with the bilingual Socratic tutor, or generate a quiz to start building your mastery score!
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+                <button className="btn btn-primary btn-sm" onClick={onOpenScan}>
+                  <Camera size={14} />
+                  <span>Scan First Problem</span>
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        );
+      })()}
 
       {/* Study Features Grid */}
       <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: 'var(--space-3)' }}>

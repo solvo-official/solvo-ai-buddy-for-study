@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Send,
   Sparkles,
@@ -29,69 +29,72 @@ export const TutorView: React.FC<TutorViewProps> = ({ initialPrompt }) => {
   );
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    loadMessages();
   }, []);
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, isSending]);
-
-  const loadMessages = async () => {
+  const loadMessages = useCallback(async () => {
     try {
       const msgs = await api.getTutorMessages();
       setMessages(msgs);
     } catch (err) {
       console.warn('Could not load tutor messages:', err);
     }
-  };
+  }, []);
 
-  const handleSend = async (textToSend?: string) => {
+  useEffect(() => {
+    loadMessages();
+  }, [loadMessages]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isSending, scrollToBottom]);
+
+  const handleSend = useCallback(async (textToSend?: string) => {
     const text = (textToSend || inputVal).trim();
     if (!text || isSending) return;
 
     setInputVal('');
     setIsSending(true);
 
+    const now = new Date();
     // Optimistic user message
     const tempUserMsg: TutorMessage = {
-      id: `temp_u_${Date.now()}`,
+      id: `temp_u_${now.getTime()}`,
       conversationId: 'default',
       sender: 'user',
       text,
       language: currentLang,
-      timestamp: new Date().toISOString(),
+      timestamp: now.toISOString(),
     };
     setMessages((prev) => [...prev, tempUserMsg]);
 
     try {
       const reply = await api.sendTutorMessage(text, currentLang);
       setMessages((prev) => [...prev.filter((m) => m.id !== tempUserMsg.id), tempUserMsg, reply]);
-    } catch (err: any) {
+    } catch {
+      const errTime = new Date();
       const errorMsg: TutorMessage = {
-        id: `err_${Date.now()}`,
+        id: `err_${errTime.getTime()}`,
         conversationId: 'default',
         sender: 'solvo',
         text: 'Sorry, I had trouble answering that. Please try asking again.',
         language: currentLang,
-        timestamp: new Date().toISOString(),
+        timestamp: errTime.toISOString(),
       };
       setMessages((prev) => [...prev, errorMsg]);
     } finally {
       setIsSending(false);
     }
-  };
+  }, [inputVal, isSending, currentLang]);
 
-  const handleClear = async () => {
+  const handleClear = useCallback(async () => {
     if (confirm('Clear chat history?')) {
       await api.clearTutorChat();
+      const clearTime = new Date();
       setMessages([
         {
-          id: `welcome_${Date.now()}`,
+          id: `welcome_${clearTime.getTime()}`,
           conversationId: 'default',
           sender: 'solvo',
           text: currentLang === 'ur'
@@ -99,11 +102,11 @@ export const TutorView: React.FC<TutorViewProps> = ({ initialPrompt }) => {
             : "Hello! I'm Solvo, your AI Study Buddy. Ask me any concept, formula, or problem statement!",
           language: currentLang,
           quickActions: ['Explain simpler', 'Give an example', 'Quiz me', 'Explain in Urdu'],
-          timestamp: new Date().toISOString(),
+          timestamp: clearTime.toISOString(),
         },
       ]);
     }
-  };
+  }, [currentLang]);
 
   const defaultQuickPills = [
     { label: 'Explain simpler', icon: <Lightbulb size={13} /> },

@@ -5,13 +5,13 @@ import type {
   DatabaseSchema,
   UserRecord,
   QuestionRecord,
-  SavedQuestionRecord,
   TutorMessageRecord,
   QuizRecord,
   QuizResultRecord,
   NoteRecord,
   FlashcardRecord,
   StudyPlanRecord,
+  ProgressSummaryRecord,
 } from '../types/index.ts';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -501,7 +501,7 @@ class Database {
 
   getTutorMessages(userId: string, conversationId = 'default'): TutorMessageRecord[] {
     return this.data.tutorMessages.filter(
-      (m) => (m.userId === userId || m.userId === 'demo_user') && m.conversationId === conversationId
+      (m) => m.userId === userId && m.conversationId === conversationId
     );
   }
 
@@ -600,6 +600,139 @@ class Database {
       this.save();
     }
     return plan;
+  }
+
+  // Real-time Progress Analytics for Student
+  getProgressSummary(userId: string): ProgressSummaryRecord {
+    const user = this.getUserById(userId);
+    const questions = this.getQuestionsByUserId(userId);
+    const quizResults = this.getQuizResults(userId);
+    const notes = this.getNotesByUserId(userId);
+    const flashcards = this.getFlashcardsByUserId(userId);
+
+    const questionsSolved = questions.length;
+    const quizzesCompleted = quizResults.length;
+    const averageQuizScore =
+      quizzesCompleted > 0
+        ? Math.round(quizResults.reduce((acc, q) => acc + q.percentage, 0) / quizzesCompleted)
+        : 0;
+
+    const studyStreak = user?.streakDays || 1;
+    const studyTimeMinutes =
+      questionsSolved * 6 + quizzesCompleted * 12 + notes.length * 8 + flashcards.length * 3;
+
+    // Aggregate subjects studied
+    const subjectMap = new Map<string, { count: number; totalScore: number; scoreCount: number }>();
+    for (const q of questions) {
+      const s = q.subject || 'General STEM';
+      const curr = subjectMap.get(s) || { count: 0, totalScore: 0, scoreCount: 0 };
+      curr.count += 1;
+      subjectMap.set(s, curr);
+    }
+    for (const qr of quizResults) {
+      const s = qr.subject || 'General STEM';
+      const curr = subjectMap.get(s) || { count: 0, totalScore: 0, scoreCount: 0 };
+      curr.count += 1;
+      curr.totalScore += qr.percentage;
+      curr.scoreCount += 1;
+      subjectMap.set(s, curr);
+    }
+
+    const subjectsStudied = Array.from(subjectMap.entries()).map(([subject, data]) => ({
+      subject,
+      count: data.count,
+      accuracy: data.scoreCount > 0 ? Math.round(data.totalScore / data.scoreCount) : 85,
+    }));
+
+    // Strong & weak topics based on real quiz performance
+    const strongSet = new Set<string>();
+    const weakSet = new Set<string>();
+    for (const qr of quizResults) {
+      if (qr.percentage >= 80) {
+        strongSet.add(qr.topic);
+      } else {
+        weakSet.add(qr.topic);
+      }
+    }
+    const strongTopics = Array.from(strongSet);
+    const weakTopics = Array.from(weakSet);
+
+    // Recent activity log
+    const recentActivity: ProgressSummaryRecord['recentActivity'] = [];
+    for (const q of questions.slice(0, 3)) {
+      recentActivity.push({
+        id: q.id,
+        type: 'question',
+        title: q.questionText.slice(0, 45) + (q.questionText.length > 45 ? '...' : ''),
+        subtitle: `${q.subject} · ${q.topic}`,
+        timestamp: q.createdAt,
+      });
+    }
+    for (const qr of quizResults.slice(0, 2)) {
+      recentActivity.push({
+        id: qr.id,
+        type: 'quiz',
+        title: `${qr.topic} Quiz (${qr.percentage}%)`,
+        subtitle: `${qr.subject} · ${qr.score}/${qr.totalQuestions} correct`,
+        timestamp: qr.completedAt,
+      });
+    }
+    for (const n of notes.slice(0, 2)) {
+      recentActivity.push({
+        id: n.id,
+        type: 'note',
+        title: n.title,
+        subtitle: `${n.subject} · Revision summary`,
+        timestamp: n.createdAt,
+      });
+    }
+
+    // Dynamic smart recommendations
+    const recommendations: ProgressSummaryRecord['recommendations'] = [];
+    if (weakTopics.length > 0) {
+      const topWeak = weakTopics[0];
+      const matchingQuiz = quizResults.find((qr) => qr.topic === topWeak);
+      recommendations.push({
+        id: `rec_weak_${topWeak}`,
+        title: `${topWeak}: Concept Booster`,
+        description: `Your last quiz score indicated room for growth in ${topWeak}. Reviewing key definitions and retaking a focused quiz will solidify your mastery.`,
+        actionType: 'quiz',
+        subject: matchingQuiz?.subject || 'STEM',
+        topic: topWeak,
+      });
+    } else if (questionsSolved > 0) {
+      const lastQ = questions[0];
+      recommendations.push({
+        id: `rec_practice_${lastQ.topic}`,
+        title: `Test Knowledge: ${lastQ.topic}`,
+        description: `You recently solved problems in ${lastQ.topic}. Reinforce what you learned with a quick 5-question evaluation.`,
+        actionType: 'quiz',
+        subject: lastQ.subject,
+        topic: lastQ.topic,
+      });
+    } else {
+      recommendations.push({
+        id: 'rec_welcome',
+        title: 'Start with your First Problem',
+        description: 'Scan an equation from your notes or type a homework question to see Solvo AI breakdown the solution step-by-step.',
+        actionType: 'practice',
+        subject: 'General Science',
+        topic: 'Problem Solving',
+      });
+    }
+
+    return {
+      questionsSolved,
+      quizzesCompleted,
+      averageQuizScore,
+      studyStreak,
+      studyTimeMinutes,
+      subjectsStudied,
+      strongTopics,
+      weakTopics,
+      recentActivity,
+      recommendations,
+    };
   }
 }
 

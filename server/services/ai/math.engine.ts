@@ -6,13 +6,6 @@ import type { SolveQuestionResult } from './ai.interface.ts';
  * for arithmetic, linear algebra, quadratic equations, and core STEM laws.
  */
 
-interface BinaryOp {
-  left: number;
-  op: string;
-  right: number;
-  raw: string;
-}
-
 export class MathEngine {
   /**
    * Evaluates if input is a mathematical or STEM problem and returns a verified solution.
@@ -105,7 +98,7 @@ export class MathEngine {
     }
 
     // Binary arithmetic: num op num (e.g. 2+2, 10-3, 4*5, 20/4, 2^3)
-    const binaryMatch = standardized.match(/^([+-]?\d+(?:\.\d+)?)\s*([\+\-\*\/xX\^])\s*([+-]?\d+(?:\.\d+)?)$/);
+    const binaryMatch = standardized.match(/^([+-]?\d+(?:\.\d+)?)\s*([+\-*xX^/])\s*([+-]?\d+(?:\.\d+)?)$/);
     if (binaryMatch) {
       const a = parseFloat(binaryMatch[1]);
       const op = binaryMatch[2];
@@ -230,10 +223,10 @@ export class MathEngine {
     }
 
     // Multi-term arithmetic with basic operators (e.g. 2 + 3 * 4 or 10 + 20 - 5)
-    if (/^[0-9\.\s\+\-\*\/\(\)\^]+$/.test(standardized) && /[0-9]/.test(standardized) && /[\+\-\*\/]/.test(standardized)) {
+    if (/^[0-9.\s+\-*()^/]+$/.test(standardized) && /[0-9]/.test(standardized) && /[+\-*/]/.test(standardized)) {
       try {
         // Safe evaluation of pure numerical expressions
-        const sanitized = standardized.replace(/[^0-9\.\+\-\*\/\(\)]/g, '');
+        const sanitized = standardized.replace(/[^0-9.+\-*()/]/g, '');
         // eslint-disable-next-line no-new-func
         const evalVal = Function(`"use strict"; return (${sanitized})`)();
         if (typeof evalVal === 'number' && !isNaN(evalVal) && isFinite(evalVal)) {

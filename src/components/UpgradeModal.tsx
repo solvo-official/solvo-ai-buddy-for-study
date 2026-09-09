@@ -27,7 +27,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ isOpen, onClose }) =
         setUpgrading(false);
         onClose();
       }, 900);
-    } catch (err) {
+    } catch {
       setUpgrading(false);
     }
   };

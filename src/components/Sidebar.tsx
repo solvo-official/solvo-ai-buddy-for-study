@@ -10,7 +10,6 @@ import {
   TrendingUp,
   User,
   Crown,
-  Sparkles,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.tsx';
 

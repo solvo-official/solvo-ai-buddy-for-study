@@ -1,11 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Layers,
   Sparkles,
   RotateCw,
-  CheckCircle2,
-  AlertCircle,
-  HelpCircle,
   Trash2,
   Plus,
   ChevronLeft,
@@ -23,18 +20,18 @@ export const FlashcardsView: React.FC = () => {
   const [topicInput, setTopicInput] = useState('');
   const [subjectInput, setSubjectInput] = useState('Physics');
 
-  useEffect(() => {
-    loadFlashcards();
-  }, []);
-
-  const loadFlashcards = async () => {
+  const loadFlashcards = useCallback(async () => {
     try {
       const list = await api.getFlashcards();
       setCards(list);
     } catch (err) {
       console.warn('Could not load flashcards:', err);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadFlashcards();
+  }, [loadFlashcards]);
 
   const handleReview = async (rating: 'easy' | 'hard' | 'again') => {
     if (cards.length === 0) return;

@@ -154,6 +154,36 @@ export interface StudyPlanRecord {
   createdAt: string;
 }
 
+export interface ProgressSummaryRecord {
+  questionsSolved: number;
+  quizzesCompleted: number;
+  averageQuizScore: number;
+  studyStreak: number;
+  studyTimeMinutes: number;
+  subjectsStudied: Array<{
+    subject: string;
+    count: number;
+    accuracy: number;
+  }>;
+  strongTopics: string[];
+  weakTopics: string[];
+  recentActivity: Array<{
+    id: string;
+    type: 'question' | 'quiz' | 'note' | 'flashcard';
+    title: string;
+    subtitle: string;
+    timestamp: string;
+  }>;
+  recommendations: Array<{
+    id: string;
+    title: string;
+    description: string;
+    actionType: 'quiz' | 'practice' | 'review';
+    subject: string;
+    topic: string;
+  }>;
+}
+
 export interface DatabaseSchema {
   users: UserRecord[];
   questions: QuestionRecord[];
@@ -165,3 +195,4 @@ export interface DatabaseSchema {
   flashcards: FlashcardRecord[];
   studyPlans: StudyPlanRecord[];
 }
+

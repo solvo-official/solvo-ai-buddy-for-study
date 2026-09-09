@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   Camera,
   Upload,
@@ -6,9 +6,7 @@ import {
   RefreshCw,
   Sparkles,
   AlertCircle,
-  Check,
   Type,
-  Maximize2,
 } from 'lucide-react';
 import { api } from '../api/client.ts';
 import type { SolvedQuestion } from '../types/index.ts';
@@ -28,7 +26,6 @@ export const ScanModal: React.FC<ScanModalProps> = ({ isOpen, onClose, onSolutio
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisStep, setAnalysisStep] = useState(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [cameraActive, setCameraActive] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -42,19 +39,14 @@ export const ScanModal: React.FC<ScanModalProps> = ({ isOpen, onClose, onSolutio
     'Finalizing educational explanations...',
   ];
 
-  // Camera start/stop lifecycle
-  useEffect(() => {
-    if (isOpen && mode === 'camera' && !capturedImage) {
-      startCamera();
-    } else {
-      stopCamera();
+  const stopCamera = useCallback(() => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
     }
-    return () => {
-      stopCamera();
-    };
-  }, [isOpen, mode, capturedImage]);
+  }, []);
 
-  const startCamera = async () => {
+  const startCamera = useCallback(async () => {
     setErrorMessage(null);
     try {
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -66,25 +58,27 @@ export const ScanModal: React.FC<ScanModalProps> = ({ isOpen, onClose, onSolutio
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
           videoRef.current.play();
-          setCameraActive(true);
         }
       } else {
         setMode('upload');
       }
     } catch (err: any) {
       console.warn('Camera access denied or unavailable, switching to file upload:', err.message);
-      setCameraActive(false);
       setMode('upload');
     }
-  };
+  }, []);
 
-  const stopCamera = () => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
+  // Camera start/stop lifecycle
+  useEffect(() => {
+    if (isOpen && mode === 'camera' && !capturedImage) {
+      startCamera();
+    } else {
+      stopCamera();
     }
-    setCameraActive(false);
-  };
+    return () => {
+      stopCamera();
+    };
+  }, [isOpen, mode, capturedImage, startCamera, stopCamera]);
 
   const capturePhoto = () => {
     if (videoRef.current && canvasRef.current) {

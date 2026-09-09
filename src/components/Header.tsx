@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, Flame, Sun, Moon, Crown, Globe } from 'lucide-react';
+import { Camera, Flame, Sun, Moon, Crown, Globe } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.tsx';
 import { useTheme } from '../context/ThemeContext.tsx';
 
@@ -82,6 +82,17 @@ export const Header: React.FC<HeaderProps> = ({ onOpenUpgrade, onOpenProfile, on
           <Flame size={14} fill="currentColor" />
           <span>{user?.streakDays || 1}d</span>
         </div>
+
+        {/* Quick Scan CTA */}
+        <button
+          className="btn btn-primary btn-sm"
+          onClick={onOpenScan}
+          style={{ padding: '4px 10px', fontSize: '0.78rem', display: 'flex', gap: '5px', alignItems: 'center', fontWeight: 700 }}
+          title="Scan a Question"
+        >
+          <Camera size={13} />
+          <span className="hide-mobile">Scan</span>
+        </button>
 
         {/* Language Switcher */}
         <button

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, LogIn, UserPlus, X, Sparkles, CheckCircle2, Shield } from 'lucide-react';
+import { LogIn, UserPlus, X, Sparkles } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.tsx';
 
 interface AuthModalProps {
