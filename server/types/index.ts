@@ -60,7 +60,7 @@ export interface TutorMessageRecord {
   id: string;
   userId: string;
   conversationId: string;
-  sender: 'user' | 'solvo';
+  sender: 'user' | 'questrix' | 'solvo';
   text: string;
   language: 'en' | 'ur';
   quickActions?: string[];

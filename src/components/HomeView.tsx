@@ -76,7 +76,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate, onOpenScan, onSe
         <div style={{ position: 'relative', zIndex: 2 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
             <span className="badge badge-primary">
-              <Sparkles size={12} /> Solvo AI Assistant
+              <Sparkles size={12} /> Questrix AI Assistant
             </span>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
               {user?.educationLevel || 'College'}
@@ -105,12 +105,12 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate, onOpenScan, onSe
               onClick={() => onNavigate('tutor')}
             >
               <MessageSquareText size={19} />
-              <span>Ask Solvo</span>
+              <span>Ask Questrix</span>
             </button>
           </div>
         </div>
 
-        {/* Decorative Solvo 3D Holographic Emblem */}
+        {/* Decorative Questrix 3D Holographic Emblem */}
         <div
           style={{
             position: 'absolute',
@@ -129,8 +129,8 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate, onOpenScan, onSe
           className="hero-emblem-badge"
         >
           <img
-            src="/solvo-icon.png"
-            alt="Solvo Holographic Emblem"
+            src="/questrix-icon.png"
+            alt="Questrix Holographic Emblem"
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
         </div>
@@ -273,7 +273,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate, onOpenScan, onSe
                   <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Personalized Learning</span>
                 </div>
                 <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '4px' }}>
-                  Welcome to your Solvo Study Workspace
+                  Welcome to your Questrix Study Workspace
                 </h3>
                 <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', maxWidth: '560px' }}>
                   Scan a difficult homework question, chat with the bilingual Socratic tutor, or generate a quiz to start building your mastery score!

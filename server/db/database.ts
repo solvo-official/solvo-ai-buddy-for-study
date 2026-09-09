@@ -24,10 +24,21 @@ const rawDataDir = isVercel
   : process.env.DATA_DIR?.trim() || path.resolve(__dirname, '../../data');
 
 if (!isVercel && /^[c-z]:/i.test(rawDataDir) && rawDataDir.toLowerCase().startsWith('c:')) {
-  throw new Error(`CRITICAL POLICY VIOLATION: Database directory cannot be located on C: drive (${rawDataDir}). Solvo requires storage on E: or Google Drive Y:.`);
+  throw new Error(`CRITICAL POLICY VIOLATION: Database directory cannot be located on C: drive (${rawDataDir}). Questrix requires storage on E: or Google Drive Y:.`);
 }
 const DATA_DIR = rawDataDir;
-const DB_FILE = path.join(DATA_DIR, 'solvo_db.json');
+const DB_FILE = (() => {
+  const questrixFile = path.join(DATA_DIR, 'questrix_db.json');
+  const legacyFile = path.join(DATA_DIR, 'solvo_db.json');
+  if (!fs.existsSync(questrixFile) && fs.existsSync(legacyFile)) {
+    try {
+      fs.copyFileSync(legacyFile, questrixFile);
+    } catch {
+      return legacyFile;
+    }
+  }
+  return questrixFile;
+})();
 
 // Ensure data directory exists
 if (!fs.existsSync(DATA_DIR)) {
@@ -40,7 +51,7 @@ const defaultSeedData: DatabaseSchema = {
     {
       id: 'demo_user',
       name: 'Sultan',
-      email: 'student@solvo.study',
+      email: 'student@questrix.study',
       isGuest: false,
       educationLevel: 'College / A-Levels',
       preferredLanguage: 'en',
@@ -152,8 +163,8 @@ const defaultSeedData: DatabaseSchema = {
       id: 'tm_1',
       userId: 'demo_user',
       conversationId: 'default',
-      sender: 'solvo',
-      text: "Assalam-o-Alaikum and Hello Sultan! I'm Solvo, your AI Study Buddy. How can I help you today? You can ask any question, paste a problem, or tap a quick action below!",
+      sender: 'questrix',
+      text: "Assalam-o-Alaikum and Hello Sultan! I'm Questrix, your AI Study Buddy. How can I help you today? You can ask any question, paste a problem, or tap a quick action below!",
       language: 'en',
       quickActions: ['Explain simpler', 'Give an example', 'Quiz me', 'Explain in Urdu', 'Practice this'],
       timestamp: new Date(Date.now() - 1000000).toISOString(),
@@ -714,7 +725,7 @@ class Database {
       recommendations.push({
         id: 'rec_welcome',
         title: 'Start with your First Problem',
-        description: 'Scan an equation from your notes or type a homework question to see Solvo AI breakdown the solution step-by-step.',
+        description: 'Scan an equation from your notes or type a homework question to see Questrix AI breakdown the solution step-by-step.',
         actionType: 'practice',
         subject: 'General Science',
         topic: 'Problem Solving',

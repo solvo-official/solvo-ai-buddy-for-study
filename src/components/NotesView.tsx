@@ -89,7 +89,7 @@ export const NotesView: React.FC<NotesViewProps> = ({ onGenerateFlashcards }) =>
         </div>
         <h1 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Notes & Document Summaries</h1>
         <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-          Upload syllabus chapters, lecture transcripts, or notes. Solvo extracts high-yield definitions, bullet summaries, and revision sheets.
+          Upload syllabus chapters, lecture transcripts, or notes. Questrix extracts high-yield definitions, bullet summaries, and revision sheets.
         </p>
       </div>
 

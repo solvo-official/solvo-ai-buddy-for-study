@@ -48,7 +48,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ isOpen, onClose }) =
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Crown size={22} color="var(--color-warning)" />
             <h3 id="upgrade-modal-title" style={{ fontSize: '1.25rem', fontWeight: 800 }}>
-              Upgrade to Solvo Pro
+              Upgrade to Questrix Pro
             </h3>
           </div>
           <button className="btn btn-ghost btn-icon" onClick={onClose}>
@@ -117,10 +117,10 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ isOpen, onClose }) =
           <Sparkles size={18} />
           <span>
             {user?.plan === 'premium'
-              ? 'You are already on Solvo Pro!'
+              ? 'You are already on Questrix Pro!'
               : upgrading
               ? 'Activating Pro Scholar...'
-              : 'Upgrade to Solvo Pro Now'}
+              : 'Upgrade to Questrix Pro Now'}
           </span>
         </button>
       </div>

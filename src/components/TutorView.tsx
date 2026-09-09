@@ -77,7 +77,7 @@ export const TutorView: React.FC<TutorViewProps> = ({ initialPrompt }) => {
       const errorMsg: TutorMessage = {
         id: `err_${errTime.getTime()}`,
         conversationId: 'default',
-        sender: 'solvo',
+        sender: 'questrix',
         text: 'Sorry, I had trouble answering that. Please try asking again.',
         language: currentLang,
         timestamp: errTime.toISOString(),
@@ -96,10 +96,10 @@ export const TutorView: React.FC<TutorViewProps> = ({ initialPrompt }) => {
         {
           id: `welcome_${clearTime.getTime()}`,
           conversationId: 'default',
-          sender: 'solvo',
+          sender: 'questrix',
           text: currentLang === 'ur'
-            ? 'خوش آمدید! میں سولوو ہوں، آپ کا تعلیمی ساتھی۔ آپ مجھ سے ریاضی، سائنس یا کسی بھی مضمون کا سوال پوچھ سکتے ہیں۔'
-            : "Hello! I'm Solvo, your AI Study Buddy. Ask me any concept, formula, or problem statement!",
+            ? 'خوش آمدید! میں کوئسٹرکس (Questrix) ہوں، آپ کا تعلیمی ساتھی۔ آپ مجھ سے ریاضی، سائنس یا کسی بھی مضمون کا سوال پوچھ سکتے ہیں۔'
+            : "Hello! I'm Questrix, your AI Study Buddy. Ask me any concept, formula, or problem statement!",
           language: currentLang,
           quickActions: ['Explain simpler', 'Give an example', 'Quiz me', 'Explain in Urdu'],
           timestamp: clearTime.toISOString(),
@@ -146,7 +146,7 @@ export const TutorView: React.FC<TutorViewProps> = ({ initialPrompt }) => {
             <Bot size={20} />
           </div>
           <div>
-            <h3 style={{ fontSize: '1.05rem', fontWeight: 700 }}>Solvo AI Tutor</h3>
+            <h3 style={{ fontSize: '1.05rem', fontWeight: 700 }}>Questrix AI Tutor</h3>
             <span style={{ fontSize: '0.72rem', color: 'var(--color-success)', display: 'flex', alignItems: 'center', gap: '4px' }}>
               <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--color-success)' }} />
               Active Educational Guidance
@@ -236,7 +236,7 @@ export const TutorView: React.FC<TutorViewProps> = ({ initialPrompt }) => {
                   {msg.text}
                 </div>
 
-                {/* Quick actions if provided by Solvo */}
+                {/* Quick actions if provided by Questrix */}
                 {!isUser && msg.quickActions && msg.quickActions.length > 0 && (
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '2px' }}>
                     {msg.quickActions.map((action, idx) => (
@@ -289,7 +289,7 @@ export const TutorView: React.FC<TutorViewProps> = ({ initialPrompt }) => {
                 alignItems: 'center',
               }}
             >
-              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Solvo is thinking</span>
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Questrix is thinking</span>
               <div style={{ display: 'flex', gap: '3px', marginLeft: '4px' }}>
                 <span className="pulsing-glow" style={{ width: 4, height: 4, borderRadius: '50%', background: 'var(--color-primary)' }} />
                 <span className="pulsing-glow" style={{ width: 4, height: 4, borderRadius: '50%', background: 'var(--color-primary)' }} />
@@ -346,7 +346,7 @@ export const TutorView: React.FC<TutorViewProps> = ({ initialPrompt }) => {
         <textarea
           className="input-field"
           rows={1}
-          placeholder={currentLang === 'ur' ? 'اردو یا انگریزی میں سوال پوچھیں...' : 'Ask Solvo any concept or problem...'}
+          placeholder={currentLang === 'ur' ? 'اردو یا انگریزی میں سوال پوچھیں...' : 'Ask Questrix any concept or problem...'}
           value={inputVal}
           onChange={(e) => setInputVal(e.target.value)}
           onKeyDown={(e) => {

@@ -23,7 +23,9 @@ build/
 *.env
 
 # Local Storage & Database (Keep personal data private)
+data/*.json
 data/solvo_db.json
+data/questrix_db.json
 data/*.tmp
 uploads/*
 !uploads/.gitkeep

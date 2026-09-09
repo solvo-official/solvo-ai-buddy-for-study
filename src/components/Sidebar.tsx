@@ -61,13 +61,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab, onOpe
           }}
         >
           <img
-            src="/solvo-icon.png"
-            alt="Solvo Logo"
+            src="/questrix-icon.png"
+            alt="Questrix Logo"
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
         </div>
         <div>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 800, letterSpacing: '-0.03em' }}>Solvo</h2>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 800, letterSpacing: '-0.03em' }}>Questrix</h2>
           <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Your AI Buddy for Study</p>
         </div>
       </div>
@@ -113,7 +113,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab, onOpe
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
             <Crown size={18} color="var(--color-warning)" />
-            <span style={{ fontSize: '0.85rem', fontWeight: 700 }}>Solvo Pro</span>
+            <span style={{ fontSize: '0.85rem', fontWeight: 700 }}>Questrix Pro</span>
           </div>
           <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '10px' }}>
             Unlimited AI scans, deep PDF analysis, and custom exam planners.

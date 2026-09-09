@@ -188,7 +188,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
               {isGoogleCustomModal ? <GoogleGLogo /> : isRegister ? <UserPlus size={18} /> : <LogIn size={18} />}
             </div>
             <h3 style={{ fontSize: '1.2rem', fontWeight: 800 }}>
-              {isGoogleCustomModal ? 'Sign in with Google ID' : isRegister ? 'Create Solvo Account' : 'Sign in to Solvo'}
+              {isGoogleCustomModal ? 'Sign in with Google ID' : isRegister ? 'Create Questrix Account' : 'Sign in to Questrix'}
             </h3>
           </div>
 

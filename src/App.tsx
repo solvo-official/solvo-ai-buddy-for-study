@@ -82,9 +82,9 @@ const MainApp: React.FC = () => {
             marginBottom: '16px',
           }}
         >
-          S
+          Q
         </div>
-        <h2 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '4px' }}>Solvo</h2>
+        <h2 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '4px' }}>Questrix</h2>
         <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Loading your study buddy...</p>
       </div>
     );

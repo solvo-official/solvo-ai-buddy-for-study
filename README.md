@@ -1,4 +1,4 @@
-# Solvo — Your AI Study Buddy 🎓✨
+# Questrix — Your AI Study Buddy 🎓✨
 
 [![Vercel Deployment](https://img.shields.io/badge/Deploy-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com)
 [![React 19](https://img.shields.io/badge/React-19-61dafb?style=for-the-badge&logo=react)](https://react.dev)
@@ -6,7 +6,7 @@
 [![Node.js](https://img.shields.io/badge/Express-5.0-green?style=for-the-badge&logo=express)](https://expressjs.com/)
 [![AI Engine](https://img.shields.io/badge/Google%20Gemini-Multimodal-4285F4?style=for-the-badge&logo=google)](https://aistudio.google.com/)
 
-> **“Your AI Study Buddy”** — Solvo is a production-ready, multimodal AI-powered learning platform designed for students from Middle School to University and Competitive Exam preparation. Scan any question, understand step-by-step derivations, practice similar problems, take adaptive quizzes, and master STEM concepts in both **English and Urdu (اردو)**.
+> **“Your AI Study Buddy”** — Questrix is a production-ready, multimodal AI-powered learning platform designed for students from Middle School to University and Competitive Exam preparation. Scan any question, understand step-by-step derivations, practice similar problems, take adaptive quizzes, and master STEM concepts in both **English and Urdu (اردو)**.
 
 ---
 
@@ -57,8 +57,8 @@
 
 ### 1. Clone & Install Dependencies
 ```bash
-git clone https://github.com/YOUR_USERNAME/solvo-study-buddy.git
-cd solvo-study-buddy
+git clone https://github.com/YOUR_USERNAME/questrix-study-buddy.git
+cd questrix-study-buddy
 npm install
 ```
 
@@ -90,22 +90,22 @@ Open **`http://localhost:5000`** in your browser.
 
 ## 🌐 Deploy to Vercel (Step-by-Step Guide)
 
-Solvo is configured out-of-the-box for zero-configuration Vercel deployment using Express Serverless Functions and Vite SPA builds.
+Questrix is configured out-of-the-box for zero-configuration Vercel deployment using Express Serverless Functions and Vite SPA builds.
 
 ### Step 1: Push Your Code to GitHub
 ```bash
 git init
 git add .
-git commit -m "Initial commit: Solvo AI Study Buddy"
+git commit -m "Initial commit: Questrix AI Study Buddy"
 git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/solvo.git
+git remote add origin https://github.com/YOUR_USERNAME/questrix.git
 git push -u origin main
 ```
 
 ### Step 2: Import into Vercel
 1. Go to [vercel.com](https://vercel.com) and log in with your GitHub account.
 2. Click **"Add New..."** ➔ **"Project"**.
-3. Select your `solvo` repository and click **"Import"**.
+3. Select your `questrix` repository and click **"Import"**.
 4. Vercel will automatically detect the Vite framework and use:
    - **Build Command**: `vite build`
    - **Output Directory**: `dist`
@@ -115,7 +115,7 @@ In the Vercel project configuration, expand **Environment Variables** and add:
 | Key | Description | Example |
 |---|---|---|
 | `GEMINI_API_KEY` | Your Google Gemini API Key | `AIzaSy...` |
-| `JWT_SECRET` | Secret token string for sessions | `solvo_secure_key_2026` |
+| `JWT_SECRET` | Secret token string for sessions | `questrix_secure_key_2026` |
 | `VITE_GOOGLE_CLIENT_ID` | Google OAuth Client ID | `12345...apps.googleusercontent.com` |
 | `NODE_ENV` | Environment mode | `production` |
 
@@ -129,17 +129,17 @@ Click **"Deploy"**. Vercel will compile the Vite frontend into `/dist` and serve
 To enable the **"Continue with Google"** button with your own Google Cloud credentials:
 
 1. Visit the [Google Cloud Console](https://console.cloud.google.com/).
-2. Create a new project named **"Solvo Study Assistant"**.
+2. Create a new project named **"Questrix Study Assistant"**.
 3. Go to **APIs & Services** ➔ **OAuth consent screen**:
    - User Type: **External**
-   - App Name: **Solvo**
+   - App Name: **Questrix**
    - Add your support email and developer contact email.
 4. Go to **APIs & Services** ➔ **Credentials**:
    - Click **Create Credentials** ➔ **OAuth client ID**.
    - Application Type: **Web application**.
    - **Authorized JavaScript origins**:
      - `http://localhost:5000` (for local development)
-     - `https://your-solvo-app.vercel.app` (your Vercel domain)
+     - `https://your-questrix-app.vercel.app` (your Vercel domain)
    - Click **Create**.
 5. Copy the generated **Client ID** (e.g., `123456789-abc.apps.googleusercontent.com`).
 6. Paste it into:

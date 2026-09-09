@@ -39,7 +39,7 @@ export interface SolveQuestionResult {
 
 export interface ChatTutorInput {
   message: string;
-  history: Array<{ sender: 'user' | 'solvo'; text: string }>;
+  history: Array<{ sender: 'user' | 'questrix' | 'solvo'; text: string }>;
   language: 'en' | 'ur';
 }
 

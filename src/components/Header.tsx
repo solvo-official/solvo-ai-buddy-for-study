@@ -36,14 +36,14 @@ export const Header: React.FC<HeaderProps> = ({ onOpenUpgrade, onOpenProfile, on
           }}
         >
           <img
-            src="/solvo-icon.png"
-            alt="Solvo Logo"
+            src="/questrix-icon.png"
+            alt="Questrix Logo"
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
         </div>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ fontSize: '1.2rem', fontWeight: 800, letterSpacing: '-0.03em' }}>Solvo</span>
+            <span style={{ fontSize: '1.2rem', fontWeight: 800, letterSpacing: '-0.03em' }}>Questrix</span>
             {user?.plan === 'premium' ? (
               <span className="badge badge-warning" style={{ fontSize: '0.65rem', padding: '1px 6px' }}>
                 <Crown size={10} /> PRO

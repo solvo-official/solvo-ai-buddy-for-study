@@ -14,7 +14,7 @@ import type {
 const API_BASE = '/api';
 
 function getHeaders(isFormData = false): HeadersInit {
-  const token = localStorage.getItem('solvo_token');
+  const token = localStorage.getItem('questrix_token') || localStorage.getItem('solvo_token');
   const headers: Record<string, string> = {};
   if (token && token !== 'null' && token !== 'undefined') {
     headers['Authorization'] = `Bearer ${token}`;
@@ -35,11 +35,11 @@ export const api = {
         return data.user;
       }
     } catch (err) {
-      console.warn('[Solvo API] Could not fetch remote profile:', err);
+      console.warn('[Questrix API] Could not fetch remote profile:', err);
     }
 
     // Return cached user from local storage
-    const cached = localStorage.getItem('solvo_user');
+    const cached = localStorage.getItem('questrix_user') || localStorage.getItem('solvo_user');
     if (cached) {
       try {
         return JSON.parse(cached);
@@ -59,17 +59,18 @@ export const api = {
       if (res.ok) {
         return await res.json();
       }
-      console.warn(`[Solvo API] Remote login returned ${res.status}, activating local partition.`);
+      console.warn(`[Questrix API] Remote login returned ${res.status}, activating local partition.`);
     } catch (err) {
-      console.warn('[Solvo API] Network error during login, activating local partition:', err);
+      console.warn('[Questrix API] Network error during login, activating local partition:', err);
     }
 
     // Fallback: Deterministic student profile partitioned by Gmail
     const userId = 'user_' + cleanEmail.replace(/[^a-zA-Z0-9]/g, '_');
-    const localKey = `solvo_profile_${userId}`;
+    const localKey = `questrix_profile_${userId}`;
+    const legacyKey = `solvo_profile_${userId}`;
     let existing: UserProfile | null = null;
     try {
-      const raw = localStorage.getItem(localKey);
+      const raw = localStorage.getItem(localKey) || localStorage.getItem(legacyKey);
       if (raw) existing = JSON.parse(raw);
     } catch {}
 
@@ -110,9 +111,9 @@ export const api = {
       if (res.ok) {
         return await res.json();
       }
-      console.warn(`[Solvo API] Remote register returned ${res.status}, activating local partition.`);
+      console.warn(`[Questrix API] Remote register returned ${res.status}, activating local partition.`);
     } catch (err) {
-      console.warn('[Solvo API] Network error during register, activating local partition:', err);
+      console.warn('[Questrix API] Network error during register, activating local partition:', err);
     }
 
     const userId = 'user_' + cleanEmail.replace(/[^a-zA-Z0-9]/g, '_');
@@ -132,7 +133,7 @@ export const api = {
       questionsSolvedToday: 0,
     };
 
-    localStorage.setItem(`solvo_profile_${userId}`, JSON.stringify(user));
+    localStorage.setItem(`questrix_profile_${userId}`, JSON.stringify(user));
     return { user, token: `token_${userId}` };
   },
 
@@ -149,11 +150,11 @@ export const api = {
     const guestUser: UserProfile = {
       id: guestId,
       name: 'Guest Scholar',
-      email: `${guestId}@solvo.local`,
+      email: `${guestId}@questrix.local`,
       authProvider: 'guest',
       educationLevel: 'High School',
       preferredLanguage: 'en',
-      mainStudyGoal: 'Exploring Solvo Study Buddy',
+      mainStudyGoal: 'Exploring Questrix Study Buddy',
       plan: 'free',
       streakDays: 1,
       lastActiveDate: new Date().toISOString().split('T')[0],
@@ -181,9 +182,9 @@ export const api = {
       if (res.ok) {
         return await res.json();
       }
-      console.warn(`[Solvo API] Remote Google auth returned ${res.status}, activating local partition.`);
+      console.warn(`[Questrix API] Remote Google auth returned ${res.status}, activating local partition.`);
     } catch (err) {
-      console.warn('[Solvo API] Network error during Google auth, activating local partition:', err);
+      console.warn('[Questrix API] Network error during Google auth, activating local partition:', err);
     }
 
     let userEmail = params.email;
@@ -221,7 +222,7 @@ export const api = {
       questionsSolvedToday: 0,
     };
 
-    localStorage.setItem(`solvo_profile_${userId}`, JSON.stringify(user));
+    localStorage.setItem(`questrix_profile_${userId}`, JSON.stringify(user));
     return { user, token: `token_${userId}` };
   },
 
@@ -237,15 +238,15 @@ export const api = {
         return data.user;
       }
     } catch (err) {
-      console.warn('[Solvo API] Failed to update remote profile, saving locally:', err);
+      console.warn('[Questrix API] Failed to update remote profile, saving locally:', err);
     }
 
-    const cached = localStorage.getItem('solvo_user');
+    const cached = localStorage.getItem('questrix_user') || localStorage.getItem('solvo_user');
     const existing = cached ? JSON.parse(cached) : {};
     const updated = { ...existing, ...updates };
-    localStorage.setItem('solvo_user', JSON.stringify(updated));
+    localStorage.setItem('questrix_user', JSON.stringify(updated));
     if (updated.id) {
-      localStorage.setItem(`solvo_profile_${updated.id}`, JSON.stringify(updated));
+      localStorage.setItem(`questrix_profile_${updated.id}`, JSON.stringify(updated));
     }
     return updated;
   },

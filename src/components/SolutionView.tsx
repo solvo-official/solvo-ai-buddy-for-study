@@ -52,9 +52,9 @@ export const SolutionView: React.FC<SolutionViewProps> = ({ question, onBack, on
   };
 
   const handleShare = () => {
-    const textToShare = `Solvo Study Solution:\nQuestion: ${question.questionText}\nFinal Answer: ${question.finalAnswer}\nSolved with Solvo - Your AI Study Buddy`;
+    const textToShare = `Questrix Study Solution:\nQuestion: ${question.questionText}\nFinal Answer: ${question.finalAnswer}\nSolved with Questrix - Your AI Study Buddy`;
     if (navigator.share) {
-      navigator.share({ title: 'Solvo Solution', text: textToShare });
+      navigator.share({ title: 'Questrix Solution', text: textToShare });
     } else {
       navigator.clipboard.writeText(textToShare);
       triggerToast('Solution copied to clipboard!');
@@ -293,13 +293,13 @@ export const SolutionView: React.FC<SolutionViewProps> = ({ question, onBack, on
           </button>
         )}
 
-        {/* Ask Solvo follow-up */}
+        {/* Ask Questrix follow-up */}
         <button
           className="btn btn-secondary"
           onClick={() => onAskFollowUp(question)}
         >
           <MessageSquareText size={16} />
-          <span>Ask Solvo Follow-up</span>
+          <span>Ask Questrix Follow-up</span>
         </button>
       </div>
 

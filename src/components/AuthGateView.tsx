@@ -219,8 +219,8 @@ export const AuthGateView: React.FC = () => {
             }}
           >
             <img
-              src="/solvo-icon.png"
-              alt="Solvo 3D Emblem"
+              src="/questrix-icon.png"
+              alt="Questrix 3D Emblem"
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
           </div>
@@ -239,7 +239,7 @@ export const AuthGateView: React.FC = () => {
                 border: '1px solid rgba(56, 189, 248, 0.3)',
               }}
             >
-              Solvo • AI Buddy for Study
+              Questrix • AI Buddy for Study
             </span>
           </div>
 
@@ -460,7 +460,7 @@ export const AuthGateView: React.FC = () => {
               <span>Entering Workspace...</span>
             ) : (
               <>
-                <span>Enter Solvo Workspace</span>
+                <span>Enter Questrix Workspace</span>
                 <ArrowRight size={16} />
               </>
             )}
@@ -516,7 +516,7 @@ export const AuthGateView: React.FC = () => {
             </div>
 
             <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: 'var(--space-4)' }}>
-              Enter your Google email address to sign into your private Solvo study workspace.
+              Enter your Google email address to sign into your private Questrix study workspace.
             </p>
 
             <div className="input-group" style={{ marginBottom: 'var(--space-3)' }}>

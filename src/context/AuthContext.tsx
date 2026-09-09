@@ -21,19 +21,20 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(() => {
     try {
-      const cached = localStorage.getItem('solvo_user');
+      const cached = localStorage.getItem('questrix_user') || localStorage.getItem('solvo_user');
       return cached ? JSON.parse(cached) : null;
     } catch {
       return null;
     }
   });
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem('solvo_token'));
+  const [token, setToken] = useState<string | null>(() => localStorage.getItem('questrix_token') || localStorage.getItem('solvo_token'));
   const [isLoading, setIsLoading] = useState(false);
 
   const refreshProfile = async () => {
-    const storedToken = localStorage.getItem('solvo_token');
+    const storedToken = localStorage.getItem('questrix_token') || localStorage.getItem('solvo_token');
     if (!storedToken || storedToken === 'null' || storedToken === 'undefined') {
       setUser(null);
+      localStorage.removeItem('questrix_user');
       localStorage.removeItem('solvo_user');
       return;
     }
@@ -42,12 +43,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const u = await api.getProfile();
       if (u) {
         setUser(u);
-        localStorage.setItem('solvo_user', JSON.stringify(u));
+        localStorage.setItem('questrix_user', JSON.stringify(u));
       }
     } catch (err: any) {
       console.warn('Could not refresh profile:', err);
       // Only clear session if server explicitly returns 401 Unauthorized
       if (err?.message?.includes('401') || err?.message?.includes('Unauthorized')) {
+        localStorage.removeItem('questrix_token');
+        localStorage.removeItem('questrix_user');
         localStorage.removeItem('solvo_token');
         localStorage.removeItem('solvo_user');
         setToken(null);
@@ -57,7 +60,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
-    const storedToken = localStorage.getItem('solvo_token');
+    const storedToken = localStorage.getItem('questrix_token') || localStorage.getItem('solvo_token');
     if (storedToken) {
       refreshProfile();
     }
@@ -69,8 +72,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const res = await api.login(email);
       setUser(res.user);
       setToken(res.token);
-      localStorage.setItem('solvo_token', res.token);
-      localStorage.setItem('solvo_user', JSON.stringify(res.user));
+      localStorage.setItem('questrix_token', res.token);
+      localStorage.setItem('questrix_user', JSON.stringify(res.user));
     } finally {
       setIsLoading(false);
     }
@@ -87,8 +90,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const res = await api.register(data);
       setUser(res.user);
       setToken(res.token);
-      localStorage.setItem('solvo_token', res.token);
-      localStorage.setItem('solvo_user', JSON.stringify(res.user));
+      localStorage.setItem('questrix_token', res.token);
+      localStorage.setItem('questrix_user', JSON.stringify(res.user));
     } finally {
       setIsLoading(false);
     }
@@ -100,7 +103,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const res = await api.loginAsGuest();
       setUser(res.user);
       setToken(res.token);
-      localStorage.setItem('solvo_token', res.token);
+      localStorage.setItem('questrix_token', res.token);
+      localStorage.setItem('questrix_user', JSON.stringify(res.user));
     } finally {
       setIsLoading(false);
     }
@@ -119,14 +123,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const res = await api.loginWithGoogle(params);
       setUser(res.user);
       setToken(res.token);
-      localStorage.setItem('solvo_token', res.token);
-      localStorage.setItem('solvo_user', JSON.stringify(res.user));
+      localStorage.setItem('questrix_token', res.token);
+      localStorage.setItem('questrix_user', JSON.stringify(res.user));
     } finally {
       setIsLoading(false);
     }
   };
 
   const logout = () => {
+    localStorage.removeItem('questrix_token');
+    localStorage.removeItem('questrix_user');
     localStorage.removeItem('solvo_token');
     localStorage.removeItem('solvo_user');
     setToken(null);

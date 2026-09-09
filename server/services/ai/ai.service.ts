@@ -14,11 +14,11 @@ class AIServiceManager {
     if (apiKey && apiKey.length > 5) {
       this.activeProvider = new GeminiAIProvider(apiKey);
       this.providerName = 'Google Gemini (gemini-3.5-flash & MathEngine)';
-      console.log('Solvo AI Service initialized with Google Gemini & Math Engine Provider.');
+      console.log('Questrix AI Service initialized with Google Gemini & Math Engine Provider.');
     } else {
       this.activeProvider = new HeuristicAIProvider();
-      this.providerName = 'Solvo Heuristic Pedagogical Engine';
-      console.log('Solvo AI Service initialized with Heuristic Educational Engine.');
+      this.providerName = 'Questrix Heuristic Pedagogical Engine';
+      console.log('Questrix AI Service initialized with Heuristic Educational Engine.');
     }
   }
 

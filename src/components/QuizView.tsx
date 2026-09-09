@@ -469,7 +469,7 @@ export const QuizView: React.FC = () => {
               border: '1px solid var(--border-subtle)',
             }}
           >
-            <strong>Solvo AI Recommendation:</strong> {quizResult.recommendation}
+            <strong>Questrix AI Recommendation:</strong> {quizResult.recommendation}
           </p>
         </div>
 

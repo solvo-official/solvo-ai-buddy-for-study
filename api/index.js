@@ -16,10 +16,21 @@ var __dirname = path.dirname(__filename);
 var isVercel = !!process.env.VERCEL;
 var rawDataDir = isVercel ? "/tmp" : process.env.DATA_DIR?.trim() || path.resolve(__dirname, "../../data");
 if (!isVercel && /^[c-z]:/i.test(rawDataDir) && rawDataDir.toLowerCase().startsWith("c:")) {
-  throw new Error(`CRITICAL POLICY VIOLATION: Database directory cannot be located on C: drive (${rawDataDir}). Solvo requires storage on E: or Google Drive Y:.`);
+  throw new Error(`CRITICAL POLICY VIOLATION: Database directory cannot be located on C: drive (${rawDataDir}). Questrix requires storage on E: or Google Drive Y:.`);
 }
 var DATA_DIR = rawDataDir;
-var DB_FILE = path.join(DATA_DIR, "solvo_db.json");
+var DB_FILE = (() => {
+  const questrixFile = path.join(DATA_DIR, "questrix_db.json");
+  const legacyFile = path.join(DATA_DIR, "solvo_db.json");
+  if (!fs.existsSync(questrixFile) && fs.existsSync(legacyFile)) {
+    try {
+      fs.copyFileSync(legacyFile, questrixFile);
+    } catch {
+      return legacyFile;
+    }
+  }
+  return questrixFile;
+})();
 if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
 }
@@ -28,7 +39,7 @@ var defaultSeedData = {
     {
       id: "demo_user",
       name: "Sultan",
-      email: "student@solvo.study",
+      email: "student@questrix.study",
       isGuest: false,
       educationLevel: "College / A-Levels",
       preferredLanguage: "en",
@@ -140,8 +151,8 @@ var defaultSeedData = {
       id: "tm_1",
       userId: "demo_user",
       conversationId: "default",
-      sender: "solvo",
-      text: "Assalam-o-Alaikum and Hello Sultan! I'm Solvo, your AI Study Buddy. How can I help you today? You can ask any question, paste a problem, or tap a quick action below!",
+      sender: "questrix",
+      text: "Assalam-o-Alaikum and Hello Sultan! I'm Questrix, your AI Study Buddy. How can I help you today? You can ask any question, paste a problem, or tap a quick action below!",
       language: "en",
       quickActions: ["Explain simpler", "Give an example", "Quiz me", "Explain in Urdu", "Practice this"],
       timestamp: new Date(Date.now() - 1e6).toISOString()
@@ -653,7 +664,7 @@ var Database = class {
       recommendations.push({
         id: "rec_welcome",
         title: "Start with your First Problem",
-        description: "Scan an equation from your notes or type a homework question to see Solvo AI breakdown the solution step-by-step.",
+        description: "Scan an equation from your notes or type a homework question to see Questrix AI breakdown the solution step-by-step.",
         actionType: "practice",
         subject: "General Science",
         topic: "Problem Solving"
@@ -1376,7 +1387,7 @@ var HeuristicAIProvider = class {
     }
     if (text.includes("urdu") || text.includes("\u0627\u0631\u062F\u0648")) {
       return {
-        text: "\u0648\u0639\u0644\u06CC\u06A9\u0645 \u0627\u0644\u0633\u0644\u0627\u0645! \u0645\u06CC\u06BA \u0633\u0648\u0644\u0648\u0648 (Solvo) \u06C1\u0648\u06BA\u060C \u0622\u067E \u06A9\u0627 \u062A\u0639\u0644\u06CC\u0645\u06CC \u0633\u0627\u062A\u06BE\u06CC\u06D4 \u0622\u067E \u0645\u062C\u06BE \u0633\u06D2 \u0631\u06CC\u0627\u0636\u06CC\u060C \u0641\u0632\u06A9\u0633\u060C \u06A9\u06CC\u0645\u0633\u0679\u0631\u06CC\u060C \u0628\u0627\u0626\u06CC\u0648\u0644\u0648\u062C\u06CC \u06CC\u0627 \u06A9\u0633\u06CC \u0628\u06BE\u06CC \u0645\u0636\u0645\u0648\u0646 \u06A9\u0627 \u0633\u0648\u0627\u0644 \u0627\u0631\u062F\u0648 \u0645\u06CC\u06BA \u067E\u0648\u0686\u06BE \u0633\u06A9\u062A\u06D2 \u06C1\u06CC\u06BA\u060C \u0627\u0648\u0631 \u0645\u06CC\u06BA \u0622\u067E \u06A9\u0648 \u0622\u0633\u0627\u0646 \u0627\u0644\u0641\u0627\u0638 \u0645\u06CC\u06BA \u0645\u0631\u062D\u0644\u06C1 \u0648\u0627\u0631 \u0633\u0645\u062C\u06BE\u0627\u0624\u06BA \u06AF\u0627\u06D4 \u0622\u067E \u06A9\u06CC\u0627 \u067E\u0691\u06BE\u0646\u0627 \u0686\u0627\u06C1\u062A\u06D2 \u06C1\u06CC\u06BA\u061F",
+        text: "\u0648\u0639\u0644\u06CC\u06A9\u0645 \u0627\u0644\u0633\u0644\u0627\u0645! \u0645\u06CC\u06BA \u06A9\u0648\u0626\u0633\u0679\u0631\u06A9\u0633 (Questrix) \u06C1\u0648\u06BA\u060C \u0622\u067E \u06A9\u0627 \u062A\u0639\u0644\u06CC\u0645\u06CC \u0633\u0627\u062A\u06BE\u06CC\u06D4 \u0622\u067E \u0645\u062C\u06BE \u0633\u06D2 \u0631\u06CC\u0627\u0636\u06CC\u060C \u0641\u0632\u06A9\u0633\u060C \u06A9\u06CC\u0645\u0633\u0679\u0631\u06CC\u060C \u0628\u0627\u0626\u06CC\u0648\u0644\u0648\u062C\u06CC \u06CC\u0627 \u06A9\u0633\u06CC \u0628\u06BE\u06CC \u0645\u0636\u0645\u0648\u0646 \u06A9\u0627 \u0633\u0648\u0627\u0644 \u0627\u0631\u062F\u0648 \u0645\u06CC\u06BA \u067E\u0648\u0686\u06BE \u0633\u06A9\u062A\u06D2 \u06C1\u06CC\u06BA\u060C \u0627\u0648\u0631 \u0645\u06CC\u06BA \u0622\u067E \u06A9\u0648 \u0622\u0633\u0627\u0646 \u0627\u0644\u0641\u0627\u0638 \u0645\u06CC\u06BA \u0645\u0631\u062D\u0644\u06C1 \u0648\u0627\u0631 \u0633\u0645\u062C\u06BE\u0627\u0624\u06BA \u06AF\u0627\u06D4 \u0622\u067E \u06A9\u06CC\u0627 \u067E\u0691\u06BE\u0646\u0627 \u0686\u0627\u06C1\u062A\u06D2 \u06C1\u06CC\u06BA\u061F",
         language: "ur",
         quickActions: ["\u0631\u06CC\u0627\u0636\u06CC \u06A9\u0627 \u0633\u0648\u0627\u0644", "\u0633\u0627\u0626\u0646\u0633 \u06A9\u0627 \u062A\u0635\u0648\u0631", "\u06A9\u0648\u0626\u0632 \u0634\u0631\u0648\u0639 \u06A9\u0631\u06CC\u06BA", "\u0622\u0633\u0627\u0646 \u0645\u062B\u0627\u0644 \u062F\u06CC\u06BA"]
       };
@@ -1709,7 +1720,7 @@ Do NOT output code fences or extra text, only valid JSON.
       parts.push({ text: promptText });
       const rawJson = await this.callGemini(
         [{ role: "user", parts }],
-        "You are Solvo, an expert educational AI tutor. You provide clear, rigorous, and student-friendly step-by-step solutions without exposing internal chain-of-thought."
+        "You are Questrix, an expert educational AI tutor. You provide clear, rigorous, and student-friendly step-by-step solutions without exposing internal chain-of-thought."
       );
       const parsed = JSON.parse(rawJson);
       return parsed;
@@ -1722,7 +1733,7 @@ Do NOT output code fences or extra text, only valid JSON.
     try {
       const isUrdu = input.language === "ur" || /urdu|اردو/i.test(input.message);
       const systemInstruction = `
-You are Solvo, "Your AI Study Buddy", a patient, friendly, highly intelligent education assistant for students.
+You are Questrix, "Your AI Study Buddy", a patient, friendly, highly intelligent education assistant for students.
 You explain concepts simply, give clear examples, provide analogies, and adapt to the student's needs.
 You support both English and Urdu fluently.
 Respond in JSON:
@@ -1894,11 +1905,11 @@ var AIServiceManager = class {
     if (apiKey && apiKey.length > 5) {
       this.activeProvider = new GeminiAIProvider(apiKey);
       this.providerName = "Google Gemini (gemini-3.5-flash & MathEngine)";
-      console.log("Solvo AI Service initialized with Google Gemini & Math Engine Provider.");
+      console.log("Questrix AI Service initialized with Google Gemini & Math Engine Provider.");
     } else {
       this.activeProvider = new HeuristicAIProvider();
-      this.providerName = "Solvo Heuristic Pedagogical Engine";
-      console.log("Solvo AI Service initialized with Heuristic Educational Engine.");
+      this.providerName = "Questrix Heuristic Pedagogical Engine";
+      console.log("Questrix AI Service initialized with Heuristic Educational Engine.");
     }
   }
   getProvider() {
@@ -1917,7 +1928,7 @@ var __dirname2 = path2.dirname(__filename2);
 var isVercel2 = !!process.env.VERCEL;
 var TEMP_DIR = isVercel2 ? "/tmp" : process.env.TEMP_DIR?.trim() || path2.resolve(__dirname2, "../tmp");
 if (!isVercel2 && /^[c-z]:/i.test(TEMP_DIR) && TEMP_DIR.toLowerCase().startsWith("c:")) {
-  throw new Error(`CRITICAL POLICY VIOLATION: Temp directory cannot be located on C: drive (${TEMP_DIR}). Solvo requires storage on E: or Google Drive Y:.`);
+  throw new Error(`CRITICAL POLICY VIOLATION: Temp directory cannot be located on C: drive (${TEMP_DIR}). Questrix requires storage on E: or Google Drive Y:.`);
 }
 process.env.TEMP = TEMP_DIR;
 process.env.TMP = TEMP_DIR;
@@ -1926,7 +1937,7 @@ if (!fs2.existsSync(TEMP_DIR)) {
 }
 var rawUploadsDir = isVercel2 ? "/tmp" : process.env.UPLOADS_DIR?.trim() || path2.resolve(__dirname2, "../uploads");
 if (!isVercel2 && /^[c-z]:/i.test(rawUploadsDir) && rawUploadsDir.toLowerCase().startsWith("c:")) {
-  throw new Error(`CRITICAL POLICY VIOLATION: Uploads directory cannot be located on C: drive (${rawUploadsDir}). Solvo requires storage on E: or Google Drive Y:.`);
+  throw new Error(`CRITICAL POLICY VIOLATION: Uploads directory cannot be located on C: drive (${rawUploadsDir}). Questrix requires storage on E: or Google Drive Y:.`);
 }
 var UPLOADS_DIR = rawUploadsDir;
 if (!fs2.existsSync(UPLOADS_DIR)) {
@@ -1966,7 +1977,7 @@ if (fs2.existsSync(DIST_DIR)) {
 app.get("/api/health", (_req, res) => {
   return res.json({
     status: "ok",
-    app: "Solvo AI Study Buddy",
+    app: "Questrix AI Study Buddy",
     timestamp: (/* @__PURE__ */ new Date()).toISOString(),
     uptime: process.uptime()
   });
@@ -2040,7 +2051,7 @@ app.post("/api/auth/login", (req, res) => {
         isGuest: false,
         educationLevel: "College / A-Levels",
         preferredLanguage: "en",
-        mainStudyGoal: "Master curriculum concepts with Solvo AI",
+        mainStudyGoal: "Master curriculum concepts with Questrix AI",
         plan: "free",
         streakDays: 1,
         lastActiveDate: (/* @__PURE__ */ new Date()).toISOString().split("T")[0],
@@ -2095,7 +2106,7 @@ app.post("/api/auth/google", (req, res) => {
         isGuest: false,
         educationLevel: educationLevel || "College / A-Levels",
         preferredLanguage: "en",
-        mainStudyGoal: "Master curriculum concepts with Solvo AI",
+        mainStudyGoal: "Master curriculum concepts with Questrix AI",
         plan: "free",
         streakDays: 1,
         lastActiveDate: (/* @__PURE__ */ new Date()).toISOString().split("T")[0],
@@ -2120,11 +2131,11 @@ app.post("/api/auth/guest", (_req, res) => {
     const guestUser = {
       id: guestId,
       name: "Guest Scholar",
-      email: `${guestId}@solvo.study`,
+      email: `${guestId}@questrix.study`,
       isGuest: true,
       educationLevel: "High School",
       preferredLanguage: "en",
-      mainStudyGoal: "Explore Solvo study assistant",
+      mainStudyGoal: "Explore Questrix study assistant",
       plan: "free",
       streakDays: 3,
       lastActiveDate: (/* @__PURE__ */ new Date()).toISOString().split("T")[0],
@@ -2281,18 +2292,18 @@ app.post("/api/tutor/message", async (req, res) => {
       history,
       language: lang
     });
-    const solvoMsgRecord = {
-      id: `tm_s_${Date.now()}`,
+    const questrixMsgRecord = {
+      id: `tm_q_${Date.now()}`,
       userId,
       conversationId: "default",
-      sender: "solvo",
+      sender: "questrix",
       text: reply.text,
       language: reply.language,
       quickActions: reply.quickActions,
       timestamp: (/* @__PURE__ */ new Date()).toISOString()
     };
-    db.saveTutorMessage(solvoMsgRecord);
-    return res.json({ message: solvoMsgRecord });
+    db.saveTutorMessage(questrixMsgRecord);
+    return res.json({ message: questrixMsgRecord });
   } catch (err) {
     console.error("Error in /api/tutor/message:", err);
     return res.status(500).json({ error: err.message || "Tutor response failed." });
@@ -2379,7 +2390,7 @@ app.post("/api/quizzes/:id/submit", (req, res) => {
     } else if (percentage >= 60) {
       recommendation = `Good solid progress (${percentage}%). Review the questions you missed, especially on key formulas, then re-test.`;
     } else {
-      recommendation = `You scored ${percentage}%. We recommend reviewing the foundational concepts for ${quiz.topic} in Solvo AI Tutor, then taking a 3-question practice quiz.`;
+      recommendation = `You scored ${percentage}%. We recommend reviewing the foundational concepts for ${quiz.topic} in Questrix AI Tutor, then taking a 3-question practice quiz.`;
     }
     const resultRecord = {
       id: `qr_${Date.now()}`,
@@ -2608,7 +2619,7 @@ app.use((err, _req, res, _next) => {
 if (!isVercel2) {
   app.listen(PORT, () => {
     console.log(`===========================================`);
-    console.log(`  SOLVO Server running on port ${PORT}`);
+    console.log(`  QUESTRIX Server running on port ${PORT}`);
     console.log(`  Uploads stored on: ${UPLOADS_DIR}`);
     console.log(`  Database stored on: ${process.env.DATA_DIR || "E:\\study assistant\\data"}`);
     console.log(`  Storage Policy: ZERO C: drive writes enforced (E: / Y: only)`);

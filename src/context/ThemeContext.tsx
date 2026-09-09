@@ -12,7 +12,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, setThemeState] = useState<Theme>(() => {
-    const saved = localStorage.getItem('solvo_theme') as Theme;
+    const saved = (localStorage.getItem('questrix_theme') || localStorage.getItem('solvo_theme')) as Theme;
     if (saved === 'light' || saved === 'dark') return saved;
     // Default to dark for high-tech premium education feel, or check media query
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -20,7 +20,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('solvo_theme', theme);
+    localStorage.setItem('questrix_theme', theme);
   }, [theme]);
 
   const toggleTheme = () => {

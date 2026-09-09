@@ -19,7 +19,7 @@ const __dirname = path.dirname(__filename);
 const isVercel = !!process.env.VERCEL;
 const TEMP_DIR = isVercel ? '/tmp' : process.env.TEMP_DIR?.trim() || path.resolve(__dirname, '../tmp');
 if (!isVercel && /^[c-z]:/i.test(TEMP_DIR) && TEMP_DIR.toLowerCase().startsWith('c:')) {
-  throw new Error(`CRITICAL POLICY VIOLATION: Temp directory cannot be located on C: drive (${TEMP_DIR}). Solvo requires storage on E: or Google Drive Y:.`);
+  throw new Error(`CRITICAL POLICY VIOLATION: Temp directory cannot be located on C: drive (${TEMP_DIR}). Questrix requires storage on E: or Google Drive Y:.`);
 }
 process.env.TEMP = TEMP_DIR;
 process.env.TMP = TEMP_DIR;
@@ -29,7 +29,7 @@ if (!fs.existsSync(TEMP_DIR)) {
 
 const rawUploadsDir = isVercel ? '/tmp' : process.env.UPLOADS_DIR?.trim() || path.resolve(__dirname, '../uploads');
 if (!isVercel && /^[c-z]:/i.test(rawUploadsDir) && rawUploadsDir.toLowerCase().startsWith('c:')) {
-  throw new Error(`CRITICAL POLICY VIOLATION: Uploads directory cannot be located on C: drive (${rawUploadsDir}). Solvo requires storage on E: or Google Drive Y:.`);
+  throw new Error(`CRITICAL POLICY VIOLATION: Uploads directory cannot be located on C: drive (${rawUploadsDir}). Questrix requires storage on E: or Google Drive Y:.`);
 }
 const UPLOADS_DIR = rawUploadsDir;
 
@@ -81,7 +81,7 @@ if (fs.existsSync(DIST_DIR)) {
 app.get('/api/health', (_req: Request, res: Response) => {
   return res.json({
     status: 'ok',
-    app: 'Solvo AI Study Buddy',
+    app: 'Questrix AI Study Buddy',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
   });
@@ -168,7 +168,7 @@ app.post('/api/auth/login', (req: Request, res: Response) => {
         isGuest: false,
         educationLevel: 'College / A-Levels',
         preferredLanguage: 'en',
-        mainStudyGoal: 'Master curriculum concepts with Solvo AI',
+        mainStudyGoal: 'Master curriculum concepts with Questrix AI',
         plan: 'free',
         streakDays: 1,
         lastActiveDate: new Date().toISOString().split('T')[0],
@@ -234,7 +234,7 @@ app.post('/api/auth/google', (req: Request, res: Response) => {
         isGuest: false,
         educationLevel: educationLevel || 'College / A-Levels',
         preferredLanguage: 'en',
-        mainStudyGoal: 'Master curriculum concepts with Solvo AI',
+        mainStudyGoal: 'Master curriculum concepts with Questrix AI',
         plan: 'free',
         streakDays: 1,
         lastActiveDate: new Date().toISOString().split('T')[0],
@@ -261,11 +261,11 @@ app.post('/api/auth/guest', (_req: Request, res: Response) => {
     const guestUser: UserRecord = {
       id: guestId,
       name: 'Guest Scholar',
-      email: `${guestId}@solvo.study`,
+      email: `${guestId}@questrix.study`,
       isGuest: true,
       educationLevel: 'High School',
       preferredLanguage: 'en',
-      mainStudyGoal: 'Explore Solvo study assistant',
+      mainStudyGoal: 'Explore Questrix study assistant',
       plan: 'free',
       streakDays: 3,
       lastActiveDate: new Date().toISOString().split('T')[0],
@@ -458,20 +458,20 @@ app.post('/api/tutor/message', async (req: Request, res: Response) => {
       language: lang,
     });
 
-    // 4. Save Solvo message
-    const solvoMsgRecord = {
-      id: `tm_s_${Date.now()}`,
+    // 4. Save Questrix message
+    const questrixMsgRecord = {
+      id: `tm_q_${Date.now()}`,
       userId,
       conversationId: 'default',
-      sender: 'solvo' as const,
+      sender: 'questrix' as const,
       text: reply.text,
       language: reply.language,
       quickActions: reply.quickActions,
       timestamp: new Date().toISOString(),
     };
-    db.saveTutorMessage(solvoMsgRecord);
+    db.saveTutorMessage(questrixMsgRecord);
 
-    return res.json({ message: solvoMsgRecord });
+    return res.json({ message: questrixMsgRecord });
   } catch (err: any) {
     console.error('Error in /api/tutor/message:', err);
     return res.status(500).json({ error: err.message || 'Tutor response failed.' });
@@ -578,7 +578,7 @@ app.post('/api/quizzes/:id/submit', (req: Request, res: Response) => {
     } else if (percentage >= 60) {
       recommendation = `Good solid progress (${percentage}%). Review the questions you missed, especially on key formulas, then re-test.`;
     } else {
-      recommendation = `You scored ${percentage}%. We recommend reviewing the foundational concepts for ${quiz.topic} in Solvo AI Tutor, then taking a 3-question practice quiz.`;
+      recommendation = `You scored ${percentage}%. We recommend reviewing the foundational concepts for ${quiz.topic} in Questrix AI Tutor, then taking a 3-question practice quiz.`;
     }
 
     const resultRecord = {
@@ -869,7 +869,7 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
 if (!isVercel) {
   app.listen(PORT, () => {
     console.log(`===========================================`);
-    console.log(`  SOLVO Server running on port ${PORT}`);
+    console.log(`  QUESTRIX Server running on port ${PORT}`);
     console.log(`  Uploads stored on: ${UPLOADS_DIR}`);
     console.log(`  Database stored on: ${process.env.DATA_DIR || 'E:\\study assistant\\data'}`);
     console.log(`  Storage Policy: ZERO C: drive writes enforced (E: / Y: only)`);

@@ -99,7 +99,7 @@ export const PlannerView: React.FC = () => {
           </div>
           <h1 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Exam Study Planner</h1>
           <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-            Tell Solvo your exam date and subjects. We engineer a personalized, balanced daily study and revision roadmap.
+            Tell Questrix your exam date and subjects. We engineer a personalized, balanced daily study and revision roadmap.
           </p>
         </div>
 

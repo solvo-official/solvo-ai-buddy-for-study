@@ -285,7 +285,7 @@ export const ScanModal: React.FC<ScanModalProps> = ({ isOpen, onClose, onSolutio
             </div>
 
             <h4 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '6px' }}>
-              Solvo AI is Solving Your Problem
+              Questrix AI is Solving Your Problem
             </h4>
             <p style={{ fontSize: '0.875rem', color: 'var(--color-primary)', fontWeight: 600, minHeight: '24px' }}>
               {analysisStages[analysisStep]}

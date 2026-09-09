@@ -1,9 +1,9 @@
-// Solvo Comprehensive End-to-End Automated Integration Test Suite
+// Questrix Comprehensive End-to-End Automated Integration Test Suite
 const BASE = 'http://localhost:5000';
 
 async function runTests() {
   console.log('====================================================');
-  console.log('  STARTING SOLVO END-TO-END AUTOMATED TEST SUITE');
+  console.log('  STARTING QUESTRIX END-TO-END AUTOMATED TEST SUITE');
   console.log('====================================================\n');
 
   let passed = 0;
@@ -26,7 +26,7 @@ async function runTests() {
     const res = await fetch(`${BASE}/`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const html = await res.text();
-    if (!html.includes('Solvo — Your AI Study Buddy')) throw new Error('Missing Solvo title in HTML');
+    if (!html.includes('Questrix')) throw new Error('Missing Questrix title in HTML');
     if (!html.includes('id="root"')) throw new Error('Missing React root mount point');
   });
 

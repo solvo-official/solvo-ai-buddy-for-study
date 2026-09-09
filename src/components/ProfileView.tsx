@@ -78,7 +78,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenUpgrade, onOpenA
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
               <Crown size={18} color="var(--color-warning)" />
               <span style={{ fontSize: '1.05rem', fontWeight: 800 }}>
-                {isPremium ? 'Solvo Pro Scholar' : 'Solvo Free Plan'}
+                {isPremium ? 'Questrix Pro Scholar' : 'Questrix Free Plan'}
               </span>
             </div>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
@@ -174,7 +174,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenUpgrade, onOpenA
         <div>
           <h4 style={{ fontSize: '0.95rem', fontWeight: 700 }}>Account Access</h4>
           <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-            Signed in as: {user?.email || 'guest@solvo.study'}
+            Signed in as: {user?.email || 'guest@questrix.study'}
           </span>
         </div>
 

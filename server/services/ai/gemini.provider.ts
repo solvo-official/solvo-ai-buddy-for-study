@@ -132,7 +132,7 @@ Do NOT output code fences or extra text, only valid JSON.
 
       const rawJson = await this.callGemini(
         [{ role: 'user', parts }],
-        'You are Solvo, an expert educational AI tutor. You provide clear, rigorous, and student-friendly step-by-step solutions without exposing internal chain-of-thought.'
+        'You are Questrix, an expert educational AI tutor. You provide clear, rigorous, and student-friendly step-by-step solutions without exposing internal chain-of-thought.'
       );
 
       const parsed = JSON.parse(rawJson);
@@ -148,7 +148,7 @@ Do NOT output code fences or extra text, only valid JSON.
       const isUrdu = input.language === 'ur' || /urdu|اردو/i.test(input.message);
 
       const systemInstruction = `
-You are Solvo, "Your AI Study Buddy", a patient, friendly, highly intelligent education assistant for students.
+You are Questrix, "Your AI Study Buddy", a patient, friendly, highly intelligent education assistant for students.
 You explain concepts simply, give clear examples, provide analogies, and adapt to the student's needs.
 You support both English and Urdu fluently.
 Respond in JSON:
