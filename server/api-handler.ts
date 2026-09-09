@@ -1,7 +1,8 @@
 import type { Request, Response } from 'express';
-import app from '../server/index.ts';
+import app from './index.ts';
 
 export default function handler(req: Request, res: Response) {
+  // Restore original path if rewritten by Vercel
   const matchedPath =
     (req.headers['x-matched-path'] as string) ||
     (req.headers['x-vercel-matched-path'] as string) ||

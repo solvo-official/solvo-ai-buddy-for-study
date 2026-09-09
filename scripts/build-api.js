@@ -7,22 +7,18 @@ const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, '..');
 
 async function buildApi() {
-  console.log('📦 Bundling Vercel serverless API handlers...');
+  console.log('📦 Bundling Vercel serverless API handler...');
   try {
     await esbuild.build({
-      entryPoints: [
-        path.join(rootDir, 'api', 'index.ts'),
-        path.join(rootDir, 'api', '[...slug].ts'),
-      ],
+      entryPoints: [path.join(rootDir, 'server', 'api-handler.ts')],
       bundle: true,
       platform: 'node',
       target: 'node20',
       format: 'esm',
       packages: 'external',
-      outdir: path.join(rootDir, 'api'),
-      outExtension: { '.js': '.js' },
+      outfile: path.join(rootDir, 'api', 'index.js'),
     });
-    console.log('✅ Serverless API handlers bundled successfully to api/index.js and api/[...slug].js');
+    console.log('✅ Serverless API handler bundled successfully to api/index.js');
   } catch (err) {
     console.error('❌ Failed to bundle API:', err);
     process.exit(1);
