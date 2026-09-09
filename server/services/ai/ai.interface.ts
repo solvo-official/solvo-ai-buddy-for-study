@@ -3,7 +3,14 @@ import type {
   AlternativeMethod,
   QuizQuestion,
   StudyPlanTask,
-} from '../../src/types/index.ts';
+} from '../../../src/types/index.ts';
+
+export type {
+  SolutionStep,
+  AlternativeMethod,
+  QuizQuestion,
+  StudyPlanTask,
+};
 
 export interface SolveQuestionInput {
   questionText?: string;

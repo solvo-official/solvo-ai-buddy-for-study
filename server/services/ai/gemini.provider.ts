@@ -53,7 +53,7 @@ export class GeminiAIProvider implements IAIProvider {
         });
 
         if (response.ok) {
-          const data = await response.json();
+          const data = (await response.json()) as any;
           const candidate = data.candidates?.[0];
           const text = candidate?.content?.parts?.[0]?.text;
           if (text) return text;

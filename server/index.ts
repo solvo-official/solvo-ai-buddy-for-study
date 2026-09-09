@@ -407,7 +407,7 @@ app.get('/api/questions/saved', (req: Request, res: Response) => {
 
 app.post('/api/questions/:id/save', (req: Request, res: Response) => {
   const userId = getAuthUserId(req);
-  const questionId = req.params.id;
+  const questionId = req.params.id as string;
   const isSaved = db.toggleSaveQuestion(userId, questionId);
   return res.json({ isSaved, questionId });
 });
@@ -528,7 +528,7 @@ app.post('/api/quizzes/generate', async (req: Request, res: Response) => {
 });
 
 app.get('/api/quizzes/:id', (req: Request, res: Response) => {
-  const quiz = db.getQuizById(req.params.id);
+  const quiz = db.getQuizById(req.params.id as string);
   if (!quiz) {
     return res.status(404).json({ error: 'Quiz not found' });
   }
@@ -538,7 +538,7 @@ app.get('/api/quizzes/:id', (req: Request, res: Response) => {
 app.post('/api/quizzes/:id/submit', (req: Request, res: Response) => {
   try {
     const userId = getAuthUserId(req);
-    const quizId = req.params.id;
+    const quizId = req.params.id as string;
     const { answers } = req.body; // Array of { questionId, selectedIndex }
 
     const quiz = db.getQuizById(quizId);
@@ -672,7 +672,7 @@ app.get('/api/notes', (req: Request, res: Response) => {
 
 app.delete('/api/notes/:id', (req: Request, res: Response) => {
   const userId = getAuthUserId(req);
-  const deleted = db.deleteNote(req.params.id, userId);
+  const deleted = db.deleteNote(req.params.id as string, userId);
   return res.json({ success: deleted });
 });
 
@@ -722,7 +722,7 @@ app.post('/api/flashcards/generate', async (req: Request, res: Response) => {
 });
 
 app.patch('/api/flashcards/:id/review', (req: Request, res: Response) => {
-  const cardId = req.params.id;
+  const cardId = req.params.id as string;
   const { rating } = req.body; // 'easy' | 'hard' | 'again'
 
   const current = db.getFlashcardsByUserId(getAuthUserId(req)).find((f) => f.id === cardId);
@@ -737,7 +737,7 @@ app.patch('/api/flashcards/:id/review', (req: Request, res: Response) => {
 
 app.delete('/api/flashcards/:id', (req: Request, res: Response) => {
   const userId = getAuthUserId(req);
-  const deleted = db.deleteFlashcard(req.params.id, userId);
+  const deleted = db.deleteFlashcard(req.params.id as string, userId);
   return res.json({ success: deleted });
 });
 
@@ -796,7 +796,8 @@ app.post('/api/planner/generate', async (req: Request, res: Response) => {
 });
 
 app.patch('/api/planner/:planId/tasks/:taskId', (req: Request, res: Response) => {
-  const { planId, taskId } = req.params;
+  const planId = req.params.planId as string;
+  const taskId = req.params.taskId as string;
   const { completed } = req.body;
   const updated = db.updateStudyPlanTask(planId, taskId, Boolean(completed));
   if (!updated) {

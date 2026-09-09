@@ -2553,7 +2553,8 @@ app.post("/api/planner/generate", async (req, res) => {
   }
 });
 app.patch("/api/planner/:planId/tasks/:taskId", (req, res) => {
-  const { planId, taskId } = req.params;
+  const planId = req.params.planId;
+  const taskId = req.params.taskId;
   const { completed } = req.body;
   const updated = db.updateStudyPlanTask(planId, taskId, Boolean(completed));
   if (!updated) {

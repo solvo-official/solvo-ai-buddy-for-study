@@ -12,6 +12,7 @@ import type {
   GenerateFlashcardsResult,
   GenerateStudyPlanInput,
   GenerateStudyPlanResult,
+  StudyPlanTask,
 } from './ai.interface.ts';
 import { MathEngine } from './math.engine.ts';
 
