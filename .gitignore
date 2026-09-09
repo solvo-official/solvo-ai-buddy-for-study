@@ -1,0 +1,43 @@
+# Logs & Debugging
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Dependencies
+node_modules/
+
+# Production Build Output
+dist/
+dist-ssr/
+build/
+.vercel/
+
+# Environment Variables & Secrets (CRITICAL: Never commit to GitHub)
+.env
+.env.local
+.env.*.local
+*.env
+
+# Local Storage & Database (Keep personal data private)
+data/solvo_db.json
+data/*.tmp
+uploads/*
+!uploads/.gitkeep
+tmp/*
+!tmp/.gitkeep
+scratch/
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
