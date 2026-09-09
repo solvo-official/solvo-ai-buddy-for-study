@@ -399,8 +399,17 @@ var Database = class {
   persist(dataToSave) {
     try {
       const tempPath = `${DB_FILE}.tmp`;
-      fs.writeFileSync(tempPath, JSON.stringify(dataToSave, null, 2), "utf-8");
-      fs.renameSync(tempPath, DB_FILE);
+      const jsonStr = JSON.stringify(dataToSave, null, 2);
+      fs.writeFileSync(tempPath, jsonStr, "utf-8");
+      try {
+        fs.renameSync(tempPath, DB_FILE);
+      } catch {
+        fs.copyFileSync(tempPath, DB_FILE);
+        try {
+          fs.unlinkSync(tempPath);
+        } catch {
+        }
+      }
     } catch (err) {
       console.error("Failed to persist database:", err);
     }
@@ -2581,17 +2590,16 @@ app.get("/api/progress/summary", (req, res) => {
 app.get("/api/entitlements", (req, res) => {
   const userId = getAuthUserId(req);
   const user = db.getUserById(userId);
-  const isPremium = user?.plan === "premium";
   return res.json({
-    plan: user?.plan || "free",
-    isPremium,
+    plan: "premium",
+    isPremium: true,
     limits: {
-      dailyQuestionsLimit: isPremium ? 9999 : 25,
-      dailyScansLimit: isPremium ? 9999 : 10,
-      maxQuizQuestions: isPremium ? 20 : 5,
-      allowAdvancedPdf: isPremium,
-      allowCustomExamPlanner: isPremium,
-      allowUnlimitedHistory: isPremium
+      dailyQuestionsLimit: 99999,
+      dailyScansLimit: 99999,
+      maxQuizQuestions: 50,
+      allowAdvancedPdf: true,
+      allowCustomExamPlanner: true,
+      allowUnlimitedHistory: true
     },
     usage: {
       questionsSolvedToday: user?.questionsSolvedToday || 0,

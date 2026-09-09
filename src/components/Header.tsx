@@ -1,15 +1,14 @@
 import React from 'react';
-import { Camera, Flame, Sun, Moon, Crown, Globe } from 'lucide-react';
+import { Camera, Flame, Sun, Moon, Globe } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.tsx';
 import { useTheme } from '../context/ThemeContext.tsx';
 
 interface HeaderProps {
-  onOpenUpgrade: () => void;
   onOpenProfile: () => void;
   onOpenScan: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onOpenUpgrade, onOpenProfile, onOpenScan }) => {
+export const Header: React.FC<HeaderProps> = ({ onOpenProfile, onOpenScan }) => {
   const { user, updateProfile } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
@@ -44,20 +43,6 @@ export const Header: React.FC<HeaderProps> = ({ onOpenUpgrade, onOpenProfile, on
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <span style={{ fontSize: '1.2rem', fontWeight: 800, letterSpacing: '-0.03em' }}>Questrix</span>
-            {user?.plan === 'premium' ? (
-              <span className="badge badge-warning" style={{ fontSize: '0.65rem', padding: '1px 6px' }}>
-                <Crown size={10} /> PRO
-              </span>
-            ) : (
-              <span
-                className="badge badge-primary"
-                onClick={onOpenUpgrade}
-                style={{ fontSize: '0.65rem', padding: '1px 6px', cursor: 'pointer' }}
-                title="Click to upgrade"
-              >
-                FREE
-              </span>
-            )}
           </div>
           <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontWeight: 500 }}>
             Your AI Buddy for Study

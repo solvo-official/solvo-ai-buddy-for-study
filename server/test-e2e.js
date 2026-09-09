@@ -250,16 +250,16 @@ async function runTests() {
     if (!data.summary.recommendations || data.summary.recommendations.length === 0) throw new Error('Missing recommendations');
   });
 
-  // 14. Entitlements & Pro Upgrade
-  await test('Entitlements and Pro Upgrade flow', async () => {
+  // 14. Entitlements & Full Access verification
+  await test('Entitlements and Full Access verification', async () => {
     const entRes = await fetch(`${BASE}/api/entitlements`, {
       headers: { Authorization: `Bearer ${guestToken}` },
     });
     if (!entRes.ok) throw new Error(`HTTP ${entRes.status}`);
     const ent = await entRes.json();
-    if (ent.limits.dailyScansLimit !== 10) throw new Error('Expected 10 free scans limit');
+    if (ent.limits.dailyScansLimit < 1000) throw new Error('Expected full unlimited scans limit');
 
-    // Upgrade
+    // Upgrade route compatibility
     const upgRes = await fetch(`${BASE}/api/subscription/upgrade`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${guestToken}` },

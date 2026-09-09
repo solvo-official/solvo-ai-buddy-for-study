@@ -15,7 +15,6 @@ import { FlashcardsView } from './components/FlashcardsView.tsx';
 import { PlannerView } from './components/PlannerView.tsx';
 import { ProgressView } from './components/ProgressView.tsx';
 import { ProfileView } from './components/ProfileView.tsx';
-import { UpgradeModal } from './components/UpgradeModal.tsx';
 import { AuthModal } from './components/AuthModal.tsx';
 import { AuthGateView } from './components/AuthGateView.tsx';
 import type { SolvedQuestion } from './types/index.ts';
@@ -25,7 +24,6 @@ const MainApp: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<AppTab>('home');
   const [activeQuestion, setActiveQuestion] = useState<SolvedQuestion | null>(null);
   const [isScanOpen, setIsScanOpen] = useState(false);
-  const [isUpgradeOpen, setIsUpgradeOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [tutorPrompt, setTutorPrompt] = useState<string | undefined>(undefined);
 
@@ -101,13 +99,11 @@ const MainApp: React.FC = () => {
       <Sidebar
         currentTab={currentTab}
         onSelectTab={handleSelectTab}
-        onOpenUpgrade={() => setIsUpgradeOpen(true)}
       />
 
       {/* Main Content Area */}
       <div className="main-content">
         <Header
-          onOpenUpgrade={() => setIsUpgradeOpen(true)}
           onOpenProfile={() => handleSelectTab('profile')}
           onOpenScan={() => setIsScanOpen(true)}
         />
@@ -143,7 +139,6 @@ const MainApp: React.FC = () => {
             />
           ) : (
             <ProfileView
-              onOpenUpgrade={() => setIsUpgradeOpen(true)}
               onOpenAuth={() => setIsAuthOpen(true)}
             />
           )}
@@ -162,12 +157,6 @@ const MainApp: React.FC = () => {
         isOpen={isScanOpen}
         onClose={() => setIsScanOpen(false)}
         onSolutionGenerated={handleSolutionGenerated}
-      />
-
-      {/* Upgrade to Pro Modal */}
-      <UpgradeModal
-        isOpen={isUpgradeOpen}
-        onClose={() => setIsUpgradeOpen(false)}
       />
 
       {/* Auth Modal */}

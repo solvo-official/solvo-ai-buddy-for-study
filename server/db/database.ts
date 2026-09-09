@@ -415,8 +415,14 @@ class Database {
   private persist(dataToSave: DatabaseSchema) {
     try {
       const tempPath = `${DB_FILE}.tmp`;
-      fs.writeFileSync(tempPath, JSON.stringify(dataToSave, null, 2), 'utf-8');
-      fs.renameSync(tempPath, DB_FILE);
+      const jsonStr = JSON.stringify(dataToSave, null, 2);
+      fs.writeFileSync(tempPath, jsonStr, 'utf-8');
+      try {
+        fs.renameSync(tempPath, DB_FILE);
+      } catch {
+        fs.copyFileSync(tempPath, DB_FILE);
+        try { fs.unlinkSync(tempPath); } catch {}
+      }
     } catch (err) {
       console.error('Failed to persist database:', err);
     }

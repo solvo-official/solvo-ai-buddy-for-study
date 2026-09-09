@@ -823,18 +823,17 @@ app.get('/api/progress/summary', (req: Request, res: Response) => {
 app.get('/api/entitlements', (req: Request, res: Response) => {
   const userId = getAuthUserId(req);
   const user = db.getUserById(userId);
-  const isPremium = user?.plan === 'premium';
 
   return res.json({
-    plan: user?.plan || 'free',
-    isPremium,
+    plan: 'premium',
+    isPremium: true,
     limits: {
-      dailyQuestionsLimit: isPremium ? 9999 : 25,
-      dailyScansLimit: isPremium ? 9999 : 10,
-      maxQuizQuestions: isPremium ? 20 : 5,
-      allowAdvancedPdf: isPremium,
-      allowCustomExamPlanner: isPremium,
-      allowUnlimitedHistory: isPremium,
+      dailyQuestionsLimit: 99999,
+      dailyScansLimit: 99999,
+      maxQuizQuestions: 50,
+      allowAdvancedPdf: true,
+      allowCustomExamPlanner: true,
+      allowUnlimitedHistory: true,
     },
     usage: {
       questionsSolvedToday: user?.questionsSolvedToday || 0,

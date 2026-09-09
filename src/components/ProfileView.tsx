@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   User,
-  Crown,
+  Sparkles,
   LogOut,
   Save,
   CheckCircle2,
@@ -10,11 +10,10 @@ import { useAuth } from '../context/AuthContext.tsx';
 import type { EducationLevel, Language } from '../types/index.ts';
 
 interface ProfileViewProps {
-  onOpenUpgrade: () => void;
   onOpenAuth: () => void;
 }
 
-export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenUpgrade, onOpenAuth }) => {
+export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenAuth }) => {
   const { user, updateProfile, logout } = useAuth();
 
   const [name, setName] = useState(user?.name || '');
@@ -39,8 +38,6 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenUpgrade, onOpenA
     setTimeout(() => setSavedSuccess(false), 2500);
   };
 
-  const isPremium = user?.plan === 'premium';
-
   return (
     <div className="content-wrapper">
       <div style={{ marginBottom: 'var(--space-5)' }}>
@@ -61,42 +58,31 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenUpgrade, onOpenA
         </div>
       )}
 
-      {/* Plan Card */}
+      {/* Access Tier Card */}
       <div
         className="card"
         style={{
           padding: 'var(--space-5)',
           marginBottom: 'var(--space-6)',
-          background: isPremium
-            ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(79, 70, 229, 0.08))'
-            : 'var(--bg-surface)',
-          borderColor: isPremium ? 'var(--color-warning-border)' : 'var(--border-subtle)',
+          background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.08), rgba(79, 70, 229, 0.06))',
+          borderColor: 'rgba(56, 189, 248, 0.3)',
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-3)' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-              <Crown size={18} color="var(--color-warning)" />
+              <Sparkles size={16} color="var(--color-primary)" />
               <span style={{ fontSize: '1.05rem', fontWeight: 800 }}>
-                {isPremium ? 'Questrix Pro Scholar' : 'Questrix Free Plan'}
+                Questrix Scholar — Full Access Unlocked
               </span>
             </div>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-              {isPremium
-                ? 'Unlimited question scans, deep PDF document summarization, and priority AI processing.'
-                : '10 scans/day, standard AI tutor responses. Upgrade for unlimited scans and advanced exam plans.'}
+              All AI features, instant homework scans, step-by-step derivations, quizzes, and study planners are completely unlocked.
             </p>
           </div>
-
-          {!isPremium ? (
-            <button className="btn btn-primary btn-sm" onClick={onOpenUpgrade}>
-              <Crown size={14} /> Upgrade to Pro
-            </button>
-          ) : (
-            <span className="badge badge-success" style={{ padding: '6px 12px', fontWeight: 700 }}>
-              Active Subscription
-            </span>
-          )}
+          <span className="badge badge-success" style={{ padding: '6px 12px', fontWeight: 700 }}>
+            Full Access Free
+          </span>
         </div>
       </div>
 

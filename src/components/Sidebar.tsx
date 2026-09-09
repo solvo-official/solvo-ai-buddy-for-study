@@ -9,9 +9,7 @@ import {
   CalendarCheck,
   TrendingUp,
   User,
-  Crown,
 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext.tsx';
 
 export type AppTab =
   | 'home'
@@ -27,11 +25,9 @@ export type AppTab =
 interface SidebarProps {
   currentTab: AppTab;
   onSelectTab: (tab: AppTab) => void;
-  onOpenUpgrade: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab, onOpenUpgrade }) => {
-  const { user } = useAuth();
+export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab }) => {
 
   const navItems: Array<{ id: AppTab; label: string; icon: React.ReactNode; badge?: string }> = [
     { id: 'home', label: 'Home', icon: <Home size={19} /> },
@@ -99,48 +95,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab, onOpe
           })}
         </ul>
       </nav>
-
-      {/* Pro Upgrade Box */}
-      {user?.plan !== 'premium' ? (
-        <div
-          className="card"
-          style={{
-            background: 'linear-gradient(135deg, rgba(79, 70, 229, 0.08), rgba(14, 165, 233, 0.08))',
-            borderColor: 'var(--color-primary-border)',
-            padding: 'var(--space-4)',
-            marginTop: 'auto',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-            <Crown size={18} color="var(--color-warning)" />
-            <span style={{ fontSize: '0.85rem', fontWeight: 700 }}>Questrix Pro</span>
-          </div>
-          <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '10px' }}>
-            Unlimited AI scans, deep PDF analysis, and custom exam planners.
-          </p>
-          <button className="btn btn-primary btn-sm" style={{ width: '100%' }} onClick={onOpenUpgrade}>
-            Upgrade Now
-          </button>
-        </div>
-      ) : (
-        <div
-          className="card"
-          style={{
-            background: 'rgba(16, 185, 129, 0.08)',
-            borderColor: 'var(--color-success-border)',
-            padding: 'var(--space-3)',
-            marginTop: 'auto',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-          }}
-        >
-          <Crown size={16} color="var(--color-warning)" />
-          <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-success)' }}>
-            Pro Scholar Active
-          </span>
-        </div>
-      )}
     </aside>
   );
 };
