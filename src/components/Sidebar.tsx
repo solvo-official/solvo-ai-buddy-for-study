@@ -49,12 +49,27 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab, onOpe
   return (
     <aside className="desktop-sidebar" role="navigation">
       <div className="sidebar-logo-area">
-        <div className="logo-icon-box">
-          <Sparkles size={20} />
+        <div
+          className="logo-icon-box"
+          style={{
+            width: 40,
+            height: 40,
+            overflow: 'hidden',
+            padding: 0,
+            border: '1.5px solid rgba(56, 189, 248, 0.4)',
+            boxShadow: '0 0 16px rgba(56, 189, 248, 0.35)',
+            background: '#070c18',
+          }}
+        >
+          <img
+            src="/solvo-icon.png"
+            alt="Solvo Logo"
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
         </div>
         <div>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 800, letterSpacing: '-0.03em' }}>Solvo</h2>
-          <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Your AI Study Buddy</p>
+          <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Your AI Buddy for Study</p>
         </div>
       </div>
 

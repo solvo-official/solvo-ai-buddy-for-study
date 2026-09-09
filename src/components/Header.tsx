@@ -23,8 +23,23 @@ export const Header: React.FC<HeaderProps> = ({ onOpenUpgrade, onOpenProfile, on
   return (
     <header className="top-header" role="banner">
       <div className="header-brand">
-        <div className="logo-icon-box" style={{ width: 34, height: 34 }}>
-          <Sparkles size={18} />
+        <div
+          className="logo-icon-box"
+          style={{
+            width: 36,
+            height: 36,
+            overflow: 'hidden',
+            padding: 0,
+            border: '1.5px solid rgba(56, 189, 248, 0.4)',
+            boxShadow: '0 0 14px rgba(56, 189, 248, 0.35)',
+            background: '#070c18',
+          }}
+        >
+          <img
+            src="/solvo-icon.png"
+            alt="Solvo Logo"
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
         </div>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -45,7 +60,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenUpgrade, onOpenProfile, on
             )}
           </div>
           <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontWeight: 500 }}>
-            Your AI Study Buddy
+            Your AI Buddy for Study
           </span>
         </div>
       </div>

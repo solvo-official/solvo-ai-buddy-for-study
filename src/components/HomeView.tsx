@@ -111,19 +111,30 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate, onOpenScan, onSe
           </div>
         </div>
 
-        {/* Decorative corner element */}
+        {/* Decorative Solvo 3D Holographic Emblem */}
         <div
           style={{
             position: 'absolute',
-            right: '-20px',
-            bottom: '-30px',
-            width: '180px',
-            height: '180px',
-            borderRadius: 'var(--radius-full)',
-            background: 'radial-gradient(circle, rgba(79, 70, 229, 0.25) 0%, transparent 70%)',
+            right: '24px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            width: '140px',
+            height: '140px',
+            borderRadius: 'var(--radius-xl)',
+            overflow: 'hidden',
+            boxShadow: '0 0 28px rgba(56, 189, 248, 0.4)',
+            border: '1.5px solid rgba(56, 189, 248, 0.45)',
+            background: '#070c18',
             pointerEvents: 'none',
           }}
-        />
+          className="hero-emblem-badge"
+        >
+          <img
+            src="/solvo-icon.png"
+            alt="Solvo Holographic Emblem"
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        </div>
       </div>
 
       {/* Goal & Streak Metric Cards */}

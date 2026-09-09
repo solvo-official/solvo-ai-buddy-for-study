@@ -561,3 +561,20 @@ button, input, select, textarea {
   animation: slideUp 200ms ease;
   max-width: 360px;
 }
+
+/* Solvo Holographic Emblem Responsive Styling */
+.hero-emblem-badge {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .hero-emblem-badge {
+    display: block;
+    animation: floatSlow 6s ease-in-out infinite;
+  }
+}
+
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(-50%) rotate(0deg); }
+  50% { transform: translateY(-54%) rotate(1.5deg); }
+}
