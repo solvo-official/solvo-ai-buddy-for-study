@@ -7,7 +7,8 @@
     "dev": "concurrently -k -n \"SERVER,CLIENT\" -c \"blue.bold,green.bold\" \"npm run dev:server\" \"npm run dev:client\"",
     "dev:client": "vite",
     "dev:server": "tsx watch server/index.ts",
-    "build": "tsc -b && vite build",
+    "build": "node scripts/build-api.js && tsc -b && vite build",
+    "build:api": "node scripts/build-api.js",
     "lint": "oxlint",
     "preview": "vite preview"
   },

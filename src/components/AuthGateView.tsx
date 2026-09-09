@@ -86,7 +86,19 @@ export const AuthGateView: React.FC = () => {
   const handleGoogleClick = () => {
     const clientId = (import.meta as any).env?.VITE_GOOGLE_CLIENT_ID;
     if (clientId && (window as any).google?.accounts?.id) {
-      (window as any).google.accounts.id.prompt();
+      try {
+        (window as any).google.accounts.id.prompt((notification: any) => {
+          if (notification?.isNotDisplayed() || notification?.isSkippedMoment()) {
+            setGoogleModalEmail(email.trim() || 'sultan@gmail.com');
+            setGoogleModalName(name.trim() || 'Sultan');
+            setIsGoogleModalOpen(true);
+          }
+        });
+      } catch {
+        setGoogleModalEmail(email.trim() || 'sultan@gmail.com');
+        setGoogleModalName(name.trim() || 'Sultan');
+        setIsGoogleModalOpen(true);
+      }
     } else {
       // Open dedicated Google Account sign-in dialog
       setGoogleModalEmail(email.trim() || 'sultan@gmail.com');
