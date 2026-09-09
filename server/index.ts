@@ -77,6 +77,16 @@ if (fs.existsSync(DIST_DIR)) {
   app.use(express.static(DIST_DIR));
 }
 
+// Health check endpoint
+app.get('/api/health', (_req: Request, res: Response) => {
+  return res.json({
+    status: 'ok',
+    app: 'Solvo AI Study Buddy',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+  });
+});
+
 // Helper: Get user from request header
 function getAuthUserId(req: Request): string {
   const authHeader = req.headers['authorization'];

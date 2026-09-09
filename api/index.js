@@ -1963,6 +1963,14 @@ var DIST_DIR = path2.resolve(__dirname2, "../dist");
 if (fs2.existsSync(DIST_DIR)) {
   app.use(express.static(DIST_DIR));
 }
+app.get("/api/health", (_req, res) => {
+  return res.json({
+    status: "ok",
+    app: "Solvo AI Study Buddy",
+    timestamp: (/* @__PURE__ */ new Date()).toISOString(),
+    uptime: process.uptime()
+  });
+});
 function getAuthUserId(req) {
   const authHeader = req.headers["authorization"];
   if (authHeader && authHeader.startsWith("Bearer ")) {
