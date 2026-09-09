@@ -7,6 +7,7 @@ import {
   Mail,
   User,
   GraduationCap,
+  X,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.tsx';
 import type { EducationLevel } from '../types/index.ts';
@@ -40,6 +41,9 @@ export const AuthGateView: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [mode, setMode] = useState<'quick' | 'details'>('quick');
+  const [isGoogleModalOpen, setIsGoogleModalOpen] = useState(false);
+  const [googleModalEmail, setGoogleModalEmail] = useState('');
+  const [googleModalName, setGoogleModalName] = useState('');
 
   // Initialize Google Identity Services if client ID is configured
   useEffect(() => {
@@ -79,23 +83,41 @@ export const AuthGateView: React.FC = () => {
     }
   }, [loginWithGoogle, educationLevel]);
 
-  const handleGoogleClick = async () => {
+  const handleGoogleClick = () => {
     const clientId = (import.meta as any).env?.VITE_GOOGLE_CLIENT_ID;
     if (clientId && (window as any).google?.accounts?.id) {
       (window as any).google.accounts.id.prompt();
     } else {
-      // Direct Gmail modal/flow
-      if (!email.trim()) {
-        setEmail('student@gmail.com');
-        setMode('details');
-      } else {
-        await handleDirectSubmit();
-      }
+      // Open dedicated Google Account sign-in dialog
+      setGoogleModalEmail(email.trim() || 'sultan@gmail.com');
+      setGoogleModalName(name.trim() || 'Sultan');
+      setIsGoogleModalOpen(true);
     }
   };
 
-  const handleDirectSubmit = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
+  const handleGoogleModalSubmit = async () => {
+    if (!googleModalEmail.trim()) {
+      setError('Please enter your Google/Gmail address.');
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      await loginWithGoogle({
+        email: googleModalEmail.trim().toLowerCase(),
+        name: googleModalName.trim() || googleModalEmail.split('@')[0],
+        picture: `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(googleModalEmail)}`,
+        educationLevel,
+      });
+      setIsGoogleModalOpen(false);
+    } catch (err: any) {
+      setError(err.message || 'Google Sign-in failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDirectSubmit = async () => {
     if (!email.trim()) {
       setError('Please enter your Gmail address.');
       return;
@@ -113,7 +135,6 @@ export const AuthGateView: React.FC = () => {
           educationLevel,
         });
       } else {
-        // Direct login / instant student workspace creation
         await login(cleanEmail);
       }
     } catch (err: any) {
@@ -123,7 +144,7 @@ export const AuthGateView: React.FC = () => {
     }
   };
 
-  const quickGmailPresets = ['student@gmail.com', 'sultan@gmail.com', 'scholar@gmail.com'];
+  const quickGmailPresets = ['sultan@gmail.com', 'student@gmail.com', 'scholar@gmail.com'];
 
   return (
     <div
@@ -289,8 +310,8 @@ export const AuthGateView: React.FC = () => {
           <div style={{ flex: 1, height: '1px', background: 'var(--border-color)' }} />
         </div>
 
-        {/* Gmail Form */}
-        <form onSubmit={handleDirectSubmit}>
+        {/* Gmail Form without browser reload hazards */}
+        <div>
           <div className="input-group" style={{ marginBottom: 'var(--space-3)' }}>
             <label className="input-label" htmlFor="student-email" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <Mail size={14} color="var(--color-primary)" />
@@ -304,6 +325,12 @@ export const AuthGateView: React.FC = () => {
               placeholder="e.g. sultan@gmail.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleDirectSubmit();
+                }
+              }}
               style={{
                 fontSize: '0.92rem',
                 borderRadius: 'var(--radius-md)',
@@ -349,6 +376,12 @@ export const AuthGateView: React.FC = () => {
                   placeholder="e.g. Sultan Bhai"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleDirectSubmit();
+                    }
+                  }}
                   style={{ fontSize: '0.92rem' }}
                 />
               </div>
@@ -395,7 +428,8 @@ export const AuthGateView: React.FC = () => {
           )}
 
           <button
-            type="submit"
+            type="button"
+            onClick={handleDirectSubmit}
             disabled={loading}
             className="btn btn-primary"
             style={{
@@ -411,7 +445,7 @@ export const AuthGateView: React.FC = () => {
             }}
           >
             {loading ? (
-              <span>Logging in...</span>
+              <span>Entering Workspace...</span>
             ) : (
               <>
                 <span>Enter Solvo Workspace</span>
@@ -419,7 +453,7 @@ export const AuthGateView: React.FC = () => {
               </>
             )}
           </button>
-        </form>
+        </div>
 
         {/* Key Features Pill List */}
         <div
@@ -450,6 +484,79 @@ export const AuthGateView: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Dedicated Google Sign-in Modal */}
+      {isGoogleModalOpen && (
+        <div className="modal-overlay" role="dialog" aria-modal="true">
+          <div className="modal-dialog" style={{ maxWidth: '420px', padding: 'var(--space-6)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <GoogleGLogo />
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 800 }}>Sign in with Google</h3>
+              </div>
+              <button
+                type="button"
+                className="btn btn-ghost btn-icon"
+                onClick={() => setIsGoogleModalOpen(false)}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: 'var(--space-4)' }}>
+              Enter your Google email address to sign into your private Solvo study workspace.
+            </p>
+
+            <div className="input-group" style={{ marginBottom: 'var(--space-3)' }}>
+              <label className="input-label" htmlFor="google-email-input">Google Email</label>
+              <input
+                id="google-email-input"
+                type="email"
+                className="input-field"
+                placeholder="you@gmail.com"
+                value={googleModalEmail}
+                onChange={(e) => setGoogleModalEmail(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleGoogleModalSubmit();
+                }}
+              />
+            </div>
+
+            <div className="input-group" style={{ marginBottom: 'var(--space-4)' }}>
+              <label className="input-label" htmlFor="google-name-input">Student Name (Optional)</label>
+              <input
+                id="google-name-input"
+                type="text"
+                className="input-field"
+                placeholder="e.g. Sultan"
+                value={googleModalName}
+                onChange={(e) => setGoogleModalName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleGoogleModalSubmit();
+                }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setIsGoogleModalOpen(false)}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handleGoogleModalSubmit}
+                disabled={loading}
+              >
+                {loading ? 'Connecting...' : 'Sign In with Google'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

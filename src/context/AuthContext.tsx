@@ -19,33 +19,48 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<UserProfile | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(() => {
+    try {
+      const cached = localStorage.getItem('solvo_user');
+      return cached ? JSON.parse(cached) : null;
+    } catch {
+      return null;
+    }
+  });
   const [token, setToken] = useState<string | null>(() => localStorage.getItem('solvo_token'));
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const refreshProfile = async () => {
     const storedToken = localStorage.getItem('solvo_token');
     if (!storedToken || storedToken === 'null' || storedToken === 'undefined') {
       setUser(null);
-      setIsLoading(false);
+      localStorage.removeItem('solvo_user');
       return;
     }
 
     try {
       const u = await api.getProfile();
-      setUser(u);
-    } catch (err) {
-      console.warn('Could not fetch profile, clearing session:', err);
-      localStorage.removeItem('solvo_token');
-      setToken(null);
-      setUser(null);
-    } finally {
-      setIsLoading(false);
+      if (u) {
+        setUser(u);
+        localStorage.setItem('solvo_user', JSON.stringify(u));
+      }
+    } catch (err: any) {
+      console.warn('Could not refresh profile:', err);
+      // Only clear session if server explicitly returns 401 Unauthorized
+      if (err?.message?.includes('401') || err?.message?.includes('Unauthorized')) {
+        localStorage.removeItem('solvo_token');
+        localStorage.removeItem('solvo_user');
+        setToken(null);
+        setUser(null);
+      }
     }
   };
 
   useEffect(() => {
-    refreshProfile();
+    const storedToken = localStorage.getItem('solvo_token');
+    if (storedToken) {
+      refreshProfile();
+    }
   }, []);
 
   const login = async (email: string) => {
@@ -55,6 +70,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(res.user);
       setToken(res.token);
       localStorage.setItem('solvo_token', res.token);
+      localStorage.setItem('solvo_user', JSON.stringify(res.user));
     } finally {
       setIsLoading(false);
     }
@@ -72,6 +88,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(res.user);
       setToken(res.token);
       localStorage.setItem('solvo_token', res.token);
+      localStorage.setItem('solvo_user', JSON.stringify(res.user));
     } finally {
       setIsLoading(false);
     }
@@ -103,6 +120,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(res.user);
       setToken(res.token);
       localStorage.setItem('solvo_token', res.token);
+      localStorage.setItem('solvo_user', JSON.stringify(res.user));
     } finally {
       setIsLoading(false);
     }
@@ -110,6 +128,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = () => {
     localStorage.removeItem('solvo_token');
+    localStorage.removeItem('solvo_user');
     setToken(null);
     setUser(null);
   };
